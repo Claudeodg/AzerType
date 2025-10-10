@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qwertz - Typing Speed Trainer</title>
+    <!-- Include CSS file for game styling -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Include the 3 scripts needed to run the game -->
+    <!-- Warning: the order of js files is important -->
+    <script src="config.js" defer></script>
+    <script src="script4.js" defer></script>
+    <script src="main.js" defer></script>
+    <script src="apigemini.js" defer></script>
+
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <h1>Qwertz</h1>
+        <h2>The application to type faster!</h2>
+        <h3>Qwertz is an online application to learn to type faster on the keyboard :)</h3>
+    </header>
+
+    <!-- MAIN -->
+    <main>
+        <div class="zoneOptions">
+            <p>Choose your option and type the proposition that appears in the field below.</p>
+            <div class="optionSource">
+                <input type="radio" name="optionSource" id="mots" value="1" checked>
+                <label for="mots">Words</label>
+                <input type="radio" name="optionSource" id="phrases" value="2">
+                <label for="phrases">Sentences</label>
+            </div>
+        </div>
+
+        <div class="zoneProposition">
+            Qwertz
+        </div>
+
+        <div class="zoneSaisie">
+            <input type="text" id="inputEcriture" name="inputEcriture" placeholder="Type here...">
+            <button id="btnValiderMot">Validate</button>
+        </div>
+
+        <div class="zoneScore">
+            Your score: <span>0</span>
+        </div>
+        
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        @Copyright: Ofgoodness 
+    </footer>
+</body>
+</html>
