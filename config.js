@@ -1,5 +1,5 @@
 // Default word list
-let listeMots = [
+let wordList = [
     "goodmorning",
     "Computer",
     "Keyboard",

@@ -1,6 +1,5 @@
 // Configuration
-const GEMINI_API_KEY = 'AIzaSyDz99B8h283k17qH-cfw0zOmSxRFRxkDHo'; // Replace with your Gemini API key
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+// here we can add the gemini Keys
 
 // Global variable to store generated words/sentences
 let generatedContent = [];
@@ -155,8 +154,8 @@ function addAIButton() {
             // Update the global list in your app
             if (typeof updateListFromAI === 'function') {
                 updateListFromAI(generatedContent, isWords);
-            } else if (isWords && typeof listeMots !== 'undefined') {
-                listeMots = generatedContent;
+            } else if (isWords && typeof wordList !== 'undefined') {
+                wordList = generatedContent;
             } else if (!isWords && typeof listePhrases !== 'undefined') {
                 listePhrases = generatedContent;
             }

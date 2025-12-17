@@ -84,7 +84,7 @@ function lancerJeu() {
     
     // Select the appropriate list
     if (isMotsMode) {
-        listeActuelle = [...listeMots]; // Create a copy
+        listeActuelle = [...wordList]; // Create a copy
     } else {
         listeActuelle = [...listePhrases]; // Create a copy
     }

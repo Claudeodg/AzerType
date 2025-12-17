@@ -7,8 +7,8 @@ lancerJeu();
  */
 function updateListFromAI(newContent, isWords) {
     if (isWords) {
-        listeMots = newContent;
-        console.log("✅ Words updated from AI:", listeMots.length, "words");
+        wordList = newContent;
+        console.log("✅ Words updated from AI:", wordList.length, "words");
     } else {
         listePhrases = newContent;
         console.log("✅ Sentences updated from AI:", listePhrases.length, "sentences");
@@ -23,5 +23,5 @@ window.updateListFromAI = updateListFromAI;
 
 // Log game initialization
 console.log("🎮 Game initialized!");
-console.log("📝 Words available:", listeMots.length);
+console.log("📝 Words available:", wordList.length);
 console.log("📄 Sentences available:", listePhrases.length);
