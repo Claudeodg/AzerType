@@ -1,5 +1,5 @@
 // Start the game when everything is loaded
-lancerJeu();
+startGame();
 
 /**
  * Function to update lists with AI-generated content
@@ -8,14 +8,14 @@ lancerJeu();
 function updateListFromAI(newContent, isWords) {
     if (isWords) {
         wordList = newContent;
-        console.log("✅ Words updated from AI:", wordList.length, "words");
+        console.log(" Words updated from AI:", wordList.length, "words");
     } else {
-        listePhrases = newContent;
-        console.log("✅ Sentences updated from AI:", listePhrases.length, "sentences");
+        sentenceList = newContent;
+        console.log("Sentences updated from AI:", sentenceList.length, "sentences");
     }
     
     // Reset the game with new content
-    lancerJeu();
+    startGame();
 }
 
 // Make the function accessible globally for apigemini.js
@@ -24,4 +24,4 @@ window.updateListFromAI = updateListFromAI;
 // Log game initialization
 console.log("🎮 Game initialized!");
 console.log("📝 Words available:", wordList.length);
-console.log("📄 Sentences available:", listePhrases.length);
+console.log("📄 Sentences available:", sentenceList.length);

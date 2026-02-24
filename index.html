@@ -4,12 +4,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qwertz - Typing Speed Trainer</title>
-    <!-- Include CSS file for game styling -->
+    <title>AzerType - Typing Speed Trainer</title>
     <link rel="stylesheet" href="style.css">
-
-    <!-- Include the 3 scripts needed to run the game -->
-    <!-- Warning: the order of js files is important -->
     <script src="config.js" defer></script>
     <script src="script4.js" defer></script>
     <script src="main.js" defer></script>
@@ -17,43 +13,70 @@
 
 </head>
 <body>
-    <!-- HEADER -->
+    
     <header>
         <h1>Qwertz</h1>
         <h2>The application to type faster</h2>
-        <h3>Qwertz is an online application to learn to type faster on the keyboard :)</h3>
+        <h3>Qwertz is an online application to learn to type faster on the keyboard :</h3>
     </header>
-
-    <!-- MAIN -->
     <main>
-        <div class="zoneOptions">
+        <div class="optionArea">
             <p>Choose your option and type the proposition that appears in the field below.</p>
             <div class="optionSource">
-                <input type="radio" name="optionSource" id="mots" value="1" checked>
-                <label for="mots">Words</label>
-                <input type="radio" name="optionSource" id="phrases" value="2">
-                <label for="phrases">Sentences</label>
+                <input type="radio" name="optionSource" id="word" value="1" checked>
+                <label for="word">Words</label>
+                <input type="radio" name="optionSource" id="sentences" value="2">
+                <label for="sentences">Sentences</label>
+                <input type="radio" name="optionSource" id="ai" value="3">
+                <label for="ai">🤖 AI</label>
+
             </div>
         </div>
+        <div id="aiPanel" style="display: none;">
+            <select id="aiType">
+                <option value="words">Words</option>
+                <option value="sentences">Sentences</option>
+            </select>
 
-        <div class="zoneProposition">
+            <select id="aiTheme">
+                <option value="general">General</option>
+                <option value="nature">Nature</option>
+                <option value="technology">Technology</option>
+                <option value="cooking">Cooking</option>
+                <option value="sports">Sports</option>
+                <option value="animals">Animals</option>
+                <option value="travel">Travel</option>
+            </select>
+
+            <select id="aiLevel">
+                <option value="easy">Easy</option>
+                <option value="medium" selected>Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+
+            <input type="number" id="aiCount" value="10" min="5" max="30" style="width: 60px;">
+            <button id="btnGenerateAI">▶ Generate</button>
+            <span id="aiStatus"></span>
+        </div>
+
+        <div class="propositionArea">
             Qwertz
         </div>
 
-        <div class="zoneSaisie">
-            <input type="text" id="inputEcriture" name="inputEcriture" placeholder="Type here...">
-            <button id="btnValiderMot">Validate</button>
+        <div class="writeArea">
+            <input type="text" id="input" name="input" placeholder="Type here...">
+            <button id="validation">Validate</button>
         </div>
 
-        <div class="zoneScore">
+        <div class="scoreArea">
             Your score: <span>0</span>
         </div>
         
     </main>
 
-    <!-- FOOTER -->
+    
     <footer>
-        @Copyright: Ofgoodness 
+        @Copyright: OfGoodness 
     </footer>
 </body>
 </html>

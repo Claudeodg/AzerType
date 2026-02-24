@@ -77,12 +77,6 @@ async function getContentFromGemini(type = 'words', count = 10, theme = 'general
     } catch (error) {
         console.error('Error during generation:', error);
         
-        // Fallback content in case of error
-        if (type === 'words') {
-            return ['erreur', 'connexion', 'problème', 'réseau', 'internet'];
-        } else {
-            return ['Une erreur est survenue.', 'Vérifiez votre connexion.', 'Réessayez plus tard.'];
-        }
     }
 }
 
@@ -90,68 +84,52 @@ async function getContentFromGemini(type = 'words', count = 10, theme = 'general
  * Add a button to generate content from AI in the interface
  */
 function addAIButton() {
-    const zoneOptions = document.querySelector('.zoneOptions');
-    
-    // Create AI generation section
-    const aiSection = document.createElement('div');
-    aiSection.className = 'optionAI';
-    aiSection.style.marginTop = '20px';
-    aiSection.style.padding = '15px';
-    aiSection.style.backgroundColor = '#f0f8ff';
-    aiSection.style.borderRadius = '8px';
-    
-    aiSection.innerHTML = `
-        <h4>🤖 Generate with AI</h4>
-        <label for="aiTheme">Theme:</label>
-        <select id="aiTheme" style="margin: 5px; padding: 5px;">
-            <option value="general">General</option>
-            <option value="nature">Nature</option>
-            <option value="technology">Technology</option>
-            <option value="cooking">Cooking</option>
-            <option value="sports">Sports</option>
-            <option value="animals">Animals</option>
-            <option value="travel">Travel</option>
-        </select>
-        
-        <label for="aiLevel">Level:</label>
-        <select id="aiLevel" style="margin: 5px; padding: 5px;">
-            <option value="easy">Easy</option>
-            <option value="medium" selected>Medium</option>
-            <option value="hard">Hard</option>
-        </select>
-        
-        <label for="aiCount">Quantity:</label>
-        <input type="number" id="aiCount" value="10" min="5" max="30" style="width: 60px; margin: 5px; padding: 5px;">
-        
-        <button id="btnGenerateAI" style="margin: 5px; padding: 8px 15px; cursor: pointer;">
-            Generate New Content
-        </button>
-        <span id="aiStatus" style="margin-left: 10px; font-style: italic;"></span>
-    `;
-    
-    zoneOptions.appendChild(aiSection);
-    
-    // Add event listener to the button
-    document.getElementById('btnGenerateAI').addEventListener('click', async () => {
+    const aiRadio = document.getElementById('ai');
+    const aiPanel = document.getElementById('aiPanel');
+
+    if (!aiRadio || !aiPanel) {
+        console.error(' Element "ai" or "aiPanel" not found in the DOM');
+        return;
+    }
+
+    // Show/hide AI panel based on selected radio
+    document.querySelectorAll('input[name="optionSource"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            if (aiRadio.checked) {
+                aiPanel.style.display = 'block';
+            } else {
+                aiPanel.style.display = 'none';
+            }
+        });
+    });
+
+    // Generate button
+    const btnGenerate = document.getElementById('btnGenerateAI');
+    if (!btnGenerate) {
+        console.error('❌ Button "btnGenerateAI" not found in the DOM');
+        return;
+    }
+
+    btnGenerate.addEventListener('click', async () => {
+        const type = document.getElementById('aiType').value;
         const theme = document.getElementById('aiTheme').value;
         const level = document.getElementById('aiLevel').value;
         const count = parseInt(document.getElementById('aiCount').value);
         const statusSpan = document.getElementById('aiStatus');
         const button = document.getElementById('btnGenerateAI');
-        
-        // Check which option is selected (words or sentences)
-        const isWords = document.getElementById('mots').checked;
-        const type = isWords ? 'words' : 'sentences';
-        
-        // Show loading state
+
+        // Loading state
         statusSpan.textContent = '⏳ Generating...';
+        statusSpan.style.color = 'black';
         button.disabled = true;
-        
+
         try {
-            // Get content from Gemini
+            // Call Gemini API
             generatedContent = await getContentFromGemini(type, count, theme, level);
-            
-            // Update the global list in your app
+
+            const isWords = type === 'words';
+
+            // Update the correct list
             if (typeof updateListFromAI === 'function') {
                 updateListFromAI(generatedContent, isWords);
             } else if (isWords && typeof wordList !== 'undefined') {
@@ -159,21 +137,23 @@ function addAIButton() {
             } else if (!isWords && typeof listePhrases !== 'undefined') {
                 listePhrases = generatedContent;
             }
-            
+
+            // Success message
             statusSpan.textContent = `✅ ${generatedContent.length} items generated!`;
             statusSpan.style.color = 'green';
-            
-            // Reset the game with new content
+
+            // Restart the game with new content
             if (typeof lancerJeu === 'function') {
                 lancerJeu();
             }
-            
+
         } catch (error) {
+            console.error('Generation error:', error);
             statusSpan.textContent = '❌ Error during generation';
             statusSpan.style.color = 'red';
         } finally {
             button.disabled = false;
-            
+
             // Clear status after 3 seconds
             setTimeout(() => {
                 statusSpan.textContent = '';
@@ -182,6 +162,12 @@ function addAIButton() {
     });
 }
 
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', addAIButton);
+} else {
+    addAIButton();
+}
 // Initialize AI button when DOM is loaded
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', addAIButton);

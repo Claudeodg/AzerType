@@ -1,35 +1,35 @@
 // Global variables for game state
 let score = 0;
 let currentIndex = 0;
-let listeActuelle = [];
-let isMotsMode = true;
+let actualList = [] ;
+let isWordMode = true;
 
 /**
  * Display the score
  */
-function afficherResultat(score, nombresdeMot) {
-    let spanscore = document.querySelector(".zoneScore span");
-    let afficheScore = `${score}/${nombresdeMot}`;
-    spanscore.innerText = afficheScore;
+function showResult(score, numberOfWord) {
+    let spanscore = document.querySelector(".scoreArea span");
+    let showScore = `${score}/${numberOfWord}`;
+    spanscore.innerText = showScore;
 }
 
 /**
  * Display the current word/sentence to type
  */
-function afficherProposition(proposition) {
-    let zoneProposition = document.querySelector(".zoneProposition");
-    zoneProposition.innerText = proposition;
+function showProposition(proposition) {
+    let propositionArea = document.querySelector(".propositionArea");
+    propositionArea.innerText = proposition;
 }
 
 /**
  * Validate the user input
  */
-function validerMotSaisi() {
-    let input = document.getElementById("inputEcriture");
-    let motUtilisateur = input.value;
+function validatTheInputWord() {
+    let input = document.getElementById("input");
+    let userWord = input.value;
     
     // Check if the input matches the current proposition
-    if (motUtilisateur === listeActuelle[currentIndex]) {
+    if (userWord === actualList[currentIndex]) {
         score++;
     }
     
@@ -37,23 +37,23 @@ function validerMotSaisi() {
     currentIndex++;
     
     // Update score display
-    afficherResultat(score, listeActuelle.length);
+    showResult(score, actualList.length);
     
     // Clear input
     input.value = "";
     
     // Check if game is finished
-    if (currentIndex < listeActuelle.length) {
-        afficherProposition(listeActuelle[currentIndex]);
+    if (currentIndex < actualList.length) {
+        showProposition(actualList[currentIndex]);
     } else {
         // Game finished
-        afficherProposition(`🎉 Game finished! Your score: ${score}/${listeActuelle.length}`);
+        showProposition(`Game finished! Your score: ${score}/${actualList.length}`);
         input.disabled = true;
         
         // Show restart option after 2 seconds
         setTimeout(() => {
             if (confirm("Do you want to play again?")) {
-                lancerJeu();
+                startGame();
             }
         }, 2000);
     }
@@ -62,79 +62,90 @@ function validerMotSaisi() {
 /**
  * Handle option change (Words or Sentences)
  */
-function gererChangementOption() {
-    let choixMots = document.getElementById("mots");
-    isMotsMode = choixMots.checked;
+function manageChangementOption() {
+    let choosenAI = document.getElementById("ai");
     
+    if (choosenAI && choosenAI.checked) {
+        return;
+    }
     // Restart game with new option
-    lancerJeu();
+    startGame();
 }
 
 /**
  * Start or restart the game
  */
-function lancerJeu() {
+function startGame() {
     // Reset game state
     score = 0;
     currentIndex = 0;
     
-    // Get the selected option (words or sentences)
-    let choixMots = document.getElementById("mots");
-    isMotsMode = choixMots.checked;
-    
+     let choosenWord = document.getElementById("word");
+    let choosenAI = document.getElementById("ai"); // ← récupère le radio AI
+
     // Select the appropriate list
-    if (isMotsMode) {
-        listeActuelle = [...wordList]; // Create a copy
+    if (choosenAI && choosenAI.checked) {
+        // Mode AI — utilise le contenu généré par Gemini
+        if (generatedContent.length === 0) {
+            alert("Please generate content with AI first.");
+            return;
+        }
+        actualList = [...generatedContent];
+    } else if (choosenWord.checked) {
+        actualList = [...wordList];
     } else {
-        listeActuelle = [...listePhrases]; // Create a copy
+        actualList = [...sentenceList];
     }
-    
-    // Check if list is not empty
-    if (listeActuelle.length === 0) {
-        alert("No words/sentences available. Please generate content with AI or check your config.js file.");
+
+    if (actualList.length === 0) {
+        alert("No words/sentences available.");
         return;
     }
     
     // Enable input
-    let input = document.getElementById("inputEcriture");
+    let input = document.getElementById("input");
     input.disabled = false;
     input.value = "";
     input.focus();
     
     // Display first proposition
-    afficherProposition(listeActuelle[currentIndex]);
+    showProposition(actualList[currentIndex]);
     
     // Update score display
-    afficherResultat(score, listeActuelle.length);
+    showResult(score, actualList.length);
 }
 
 /**
  * Initialize event listeners
  */
-function initialiserEventListeners() {
+function initEventListeners() {
     // Validate button click
-    let btnValider = document.getElementById("btnValiderMot");
-    btnValider.addEventListener("click", validerMotSaisi);
+    let btnValid = document.getElementById("validation");
+    btnValid.addEventListener("click", validatTheInputWord);
     
     // Enter key press
-    let input = document.getElementById("inputEcriture");
+    let input = document.getElementById("input");
     input.addEventListener("keypress", (event) => {
         if (event.key === "Enter") {
-            validerMotSaisi();
+            validatTheInputWord();
         }
     });
     
     // Radio buttons change
-    let optionsMots = document.getElementById("mots");
-    let optionsPhrases = document.getElementById("phrases");
+    let optionsWord = document.getElementById("word");
+    let optionsSentence = document.getElementById("sentences");
+    let optionsAI = document.getElementById("ai");
     
-    optionsMots.addEventListener("change", gererChangementOption);
-    optionsPhrases.addEventListener("change", gererChangementOption);
+    optionsWord.addEventListener("change", manageChangementOption);
+    optionsSentence.addEventListener("change", manageChangementOption);
+    if (optionsAI) {
+        optionsAI.addEventListener("change", manageChangementOption);
+    }
 }
 
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initialiserEventListeners);
+    document.addEventListener('DOMContentLoaded', initEventListeners);
 } else {
-    initialiserEventListeners();
+    initEventListeners();
 }
