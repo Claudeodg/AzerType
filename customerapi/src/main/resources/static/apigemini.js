@@ -106,7 +106,7 @@ function addAIButton() {
     // Generate button
     const btnGenerate = document.getElementById('btnGenerateAI');
     if (!btnGenerate) {
-        console.error('❌ Button "btnGenerateAI" not found in the DOM');
+        console.error('Button "btnGenerateAI" not found in the DOM');
         return;
     }
 
@@ -139,7 +139,7 @@ function addAIButton() {
             }
 
             // Success message
-            statusSpan.textContent = `✅ ${generatedContent.length} items generated!`;
+            statusSpan.textContent = ` ${generatedContent.length} items generated!`;
             statusSpan.style.color = 'green';
 
             // Restart the game with new content
@@ -149,7 +149,7 @@ function addAIButton() {
 
         } catch (error) {
             console.error('Generation error:', error);
-            statusSpan.textContent = '❌ Error during generation';
+            statusSpan.textContent = 'Error during generation';
             statusSpan.style.color = 'red';
         } finally {
             button.disabled = false;
