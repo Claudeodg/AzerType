@@ -49,7 +49,17 @@ function validatTheInputWord() {
         // Game finished
         showProposition(`Game finished! Your score: ${score}/${actualList.length}`);
         input.disabled = true;
-        
+
+        fetch("/score", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ score: score} )
+        }).then(response => {
+                  if (response.ok) {
+                      console.log("Score saved !");
+                  }
+              });
+
         // Show restart option after 2 seconds
         setTimeout(() => {
             if (confirm("Do you want to play again?")) {

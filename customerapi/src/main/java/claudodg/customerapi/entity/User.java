@@ -3,6 +3,8 @@ package claudodg.customerapi.entity;
 import lombok.Data;
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Data
 public class User {
@@ -13,6 +15,8 @@ public class User {
 
     @Column(unique = true, nullable = false)
     private String email;
+
+
 
     @Column(nullable = false, length = 60)
     private String password;

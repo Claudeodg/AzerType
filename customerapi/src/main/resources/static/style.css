@@ -195,3 +195,47 @@ footer {
         padding: 10px;
     }
 }
+
+/* Sidebar container */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 220px;
+    background-color: #1a73e8;
+    display: flex;
+    flex-direction: column;
+    padding: 30px 15px;
+    box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+}
+
+/* Links inside sidebar */
+.sidebar a {
+    color: white;
+    text-decoration: none;
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+/* Hover effect */
+.sidebar a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Active link */
+.sidebar a.active {
+    background-color: rgba(255, 255, 255, 0.3);
+    font-weight: bold;
+}
+
+/* Main content pushed to the right */
+.main-content {
+    margin-left: 240px;
+    padding: 30px;
+}
