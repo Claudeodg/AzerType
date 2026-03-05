@@ -1,5 +1,3 @@
-// Configuration
-// here we can add the gemini Keys
 
 // Global variable to store generated words/sentences
 let generatedContent = [];
@@ -33,23 +31,12 @@ async function getContentFromGemini(type = 'words', count = 10, theme = 'general
             Example: Le chat dort sur le canapé.|La maison est grande et belle.`;
         }
         
-        const response = await fetch(GEMINI_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: prompt
-                    }]
-                }],
-                generationConfig: {
-                    temperature: 0.9,
-                    maxOutputTokens: 1000,
-                }
-            })
-        });
+        const response =await fetch("/api/gemini/generate", {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                        });
+
 
         if (!response.ok) {
             throw new Error(`API Error: ${response.status}`);
