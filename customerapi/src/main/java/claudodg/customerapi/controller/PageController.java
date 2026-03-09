@@ -48,11 +48,18 @@ public class PageController {
         if (user == null) {
             return "redirect:/auth/login";
         }
+        try {
 
         Map<String, Object> analysis = analysisService.analyzeUserScores(user);
         model.addAttribute("analysis", analysis);
         return "progression";
+
+        } catch (Exception e) {
+            model.addAttribute("analysis", Map.of("error", "Service unavailable"));
+            return "progression";
+        }
     }
+
     @PostMapping("/score")
     public ResponseEntity<String> saveScore(
             @RequestBody Map<String, Integer> body,
