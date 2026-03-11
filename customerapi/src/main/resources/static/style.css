@@ -1,21 +1,110 @@
 /**
  * Reset
  */
- * {
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-
-
 body {
     --color-primary: #5e75f7;
     --color-secondary: #160849;
-    --color-tertiary: #55443c;    
+    --color-tertiary: #55443c;
 }
 
-/* formatting of title */
+/* ===== GAME OVER MODAL ===== */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 300;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-overlay.active {
+        display: flex;
+    }
+
+    .modal {
+        background-color: white;
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        width: 90%;
+        max-width: 400px;
+        border-top: 6px solid var(--color-primary);
+        animation: popIn 0.3s ease;
+    }
+
+    @keyframes popIn {
+        from { transform: scale(0.8); opacity: 0; }
+        to   { transform: scale(1);   opacity: 1; }
+    }
+
+    .modal h2 {
+        font-size: 28px;
+        color: var(--color-secondary);
+        margin-bottom: 10px;
+    }
+
+    .modal .final-score {
+        font-size: 60px;
+        font-weight: 900;
+        color: var(--color-primary);
+        margin: 20px 0;
+    }
+
+    .modal .score-label {
+        font-size: 14px;
+        color: #aaa;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 30px;
+    }
+
+    .modal-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+    }
+
+    .modal-buttons button {
+        padding: 12px 25px;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn-play-again {
+        background-color: var(--color-primary);
+        color: white !important;
+    }
+
+    .btn-play-again:hover {
+        background-color: #4a5fd4 !important;
+        color: white !important;
+    }
+
+    .btn-progression {
+        background-color: var(--color-secondary);
+        color: white !important;
+    }
+
+    .btn-progression:hover {
+        background-color: #0d0530 !important;
+        color: white !important;
+    }
+}
+
+/* ===== TYPOGRAPHY ===== */
 h1 {
     margin: 10px;
     font-size: 60px;
@@ -37,11 +126,10 @@ h3 {
     color: var(--color-secondary);
 }
 
+/* ===== INPUTS ===== */
 input[type='radio'] {
-    filter: grayscale(1); 
+    filter: grayscale(1);
 }
-
-
 
 input[type='text'] {
     width: 100%;
@@ -51,7 +139,6 @@ input[type='text'] {
     border-radius: 8px;
     font-size: 17px;
     font-weight: 600;
-    font-size: 17px;
     color: var(--color-primary);
 }
 
@@ -60,6 +147,7 @@ input[type='text']::placeholder {
     opacity: 50%;
 }
 
+/* ===== BUTTONS ===== */
 button {
     padding: 5px;
     border: none;
@@ -81,17 +169,16 @@ button:focus {
     background-color: var(--color-tertiary);
     border: 3px solid var(--color-primary);
     padding: 2px;
-    
 }
 
-
+/* ===== LAYOUT ===== */
 body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
     min-height: 100vh;
-    font-family: 'Roboto', sans-serif; 
+    font-family: 'Roboto', sans-serif;
 }
 
 header {
@@ -100,6 +187,10 @@ header {
     align-items: center;
 }
 
+/**
+ * main — visual style of the game card
+ * Separate from .main-content which handles sidebar layout
+ */
 main {
     display: flex;
     flex-direction: column;
@@ -130,7 +221,7 @@ footer {
     background-color: var(--color-secondary);
 }
 
-
+/* ===== GAME COMPONENTS ===== */
 .optionSource {
     margin: 20px;
 }
@@ -139,13 +230,12 @@ footer {
     margin-left: 20px;
 }
 
-
 .propositionArea {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
-    margin: 10px 0 10px 0;
+    margin: 10px 0;
     padding: 20px;
     border-radius: 20px;
     background-color: white;
@@ -154,7 +244,6 @@ footer {
     color: var(--color-primary);
 }
 
-/* input area*/
 .writeArea {
     display: flex;
     justify-content: space-between;
@@ -174,29 +263,69 @@ footer {
     font-size: 20px;
 }
 
-/** 
- * Responsive
- */
-
-
- /*unter the 1200 px */
-@media screen and (max-width: 1200px) {
-    main {
-        width: 60%;
-        padding: 30px;
-    }
+/* ===== HAMBURGER BUTTON ===== */
+.hamburger {
+    display: none;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 200;
+    background-color: #1a73e8 !important;
+    color: white !important;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 12px !important;
+    cursor: pointer;
+    flex-direction: column;
+    gap: 5px;
 }
 
-
-/* unter the 800 px */
-@media screen and (max-width: 800px) {
-    main {
-        width: 90%;
-        padding: 10px;
-    }
+.hamburger:hover {
+    background-color: #1558b0 !important;
 }
 
-/* Sidebar container */
+.hamburger:focus {
+    border: none !important;
+    padding: 10px 12px !important;
+}
+
+.hamburger span {
+    display: block;
+    width: 24px;
+    height: 3px;
+    background-color: white;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+}
+
+/* Hamburger animation when open */
+.hamburger.open span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+.hamburger.open span:nth-child(2) {
+    opacity: 0;
+}
+.hamburger.open span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+/* ===== OVERLAY ===== */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+}
+
+.overlay.active {
+    display: block;
+}
+
+/* ===== SIDEBAR ===== */
 .sidebar {
     position: fixed;
     top: 0;
@@ -209,9 +338,17 @@ footer {
     padding: 30px 15px;
     box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
     z-index: 100;
+    transition: transform 0.3s ease;
 }
 
-/* Links inside sidebar */
+.sidebar .logo {
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
 .sidebar a {
     color: white;
     text-decoration: none;
@@ -223,19 +360,77 @@ footer {
     transition: background-color 0.2s ease;
 }
 
-/* Hover effect */
 .sidebar a:hover {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Active link */
 .sidebar a.active {
     background-color: rgba(255, 255, 255, 0.3);
     font-weight: bold;
 }
 
-/* Main content pushed to the right */
+/* ===== MAIN CONTENT — layout wrapper for sidebar offset ===== */
 .main-content {
     margin-left: 240px;
     padding: 30px;
+    transition: margin-left 0.3s ease;
+    width: calc(100% - 240px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ===== RESPONSIVE — TABLET (max 1200px) ===== */
+@media screen and (max-width: 1200px) {
+    .sidebar {
+        width: 180px;
+    }
+    .main-content {
+        margin-left: 180px;
+        width: calc(100% - 180px);
+    }
+    main {
+        width: 70%;
+    }
+}
+
+/* ===== RESPONSIVE — MOBILE (max 800px) ===== */
+@media screen and (max-width: 800px) {
+
+    /* Hamburger visible */
+    .hamburger {
+        display: flex;
+    }
+
+    /* Sidebar hidden by default */
+    .sidebar {
+        transform: translateX(-100%);
+        width: 250px;
+    }
+
+    /* Sidebar visible when open */
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    /* Main content takes full width */
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 15px;
+        padding-top: 70px;
+    }
+
+    main {
+        width: 95%;
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 36px;
+    }
+
+    h2 {
+        font-size: 22px;
+    }
 }

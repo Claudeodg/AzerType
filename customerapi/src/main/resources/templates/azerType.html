@@ -10,10 +10,39 @@
     <script th:src="@{/script4.js}" defer></script>
     <script th:src="@{/main.js}" defer></script>
     <script th:src="@{/apigemini.js}" defer></script>
+    <script th:src="@{/scriptSidebar.js}" defer></script>
 
 </head>
 <body>
-    
+    <div class="modal-overlay" id="gameOverModal">
+        <div class="modal">
+            <h2>🎮 Game Over !</h2>
+            <div class="final-score" id="finalScore">0</div>
+            <p class="score-label">Your final score</p>
+            <div class="modal-buttons">
+                <button class="btn-play-again" id="btnPlayAgain">▶ Play Again</button>
+                <button class="btn-progression" onclick="window.location.href='/progression'">📊 My Progression</button>
+            </div>
+        </div>
+    </div>
+    <!-- 1. Button hamburger — before sidebar -->
+    <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <!-- 2. Overlay dark -->
+    <div class="overlay" id="overlay"></div>
+
+
+    <div class="sidebar" id="sidebar">
+        <div class="logo">🎮 AzerType</div>
+        <a href="/azerType" class="active">🕹️ Play</a>
+        <a href="/progression" >📊 My Progression</a>
+    </div>
+
+
     <header>
         <h1>AzerType</h1>
         <h2>The application to type faster</h2>
@@ -71,17 +100,13 @@
         <div class="scoreArea">
             Your score: <span>0</span>
         </div>
-        
+
     </main>
 
-    <div class="sidebar">
-        <a href="/azerType">🎮 Play</a>
-        <a href ="/progression">📊 My Progression</a>
-    </div>
 
-    
+
     <footer>
-        @Copyright: OfGoodness 
+        @Copyright: OfTheGoodness
     </footer>
 </body>
 </html>

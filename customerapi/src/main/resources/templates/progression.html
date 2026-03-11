@@ -4,181 +4,31 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>My Progression</title>
+    <link rel="stylesheet" th:href="@{/styleOfProgression.css}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', sans-serif;
-        }
+    <script th:src="@{/scriptSidebar.js}" defer></script>
 
-        body {
-            background-color: #f4f6fb;
-        }
-
-        /* ===== SIDEBAR ===== */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            width: 220px;
-            background-color: #1a73e8;
-            display: flex;
-            flex-direction: column;
-            padding: 30px 15px;
-            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
-            z-index: 100;
-        }
-
-        .sidebar .logo {
-            color: white;
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 40px;
-            text-align: center;
-            letter-spacing: 1px;
-        }
-
-        .sidebar a {
-            color: white;
-            text-decoration: none;
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            font-size: 15px;
-            font-weight: 500;
-            transition: background-color 0.2s ease;
-        }
-
-        .sidebar a:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .sidebar a.active {
-            background-color: rgba(255, 255, 255, 0.3);
-            font-weight: bold;
-        }
-
-        /* ===== MAIN CONTENT ===== */
-        .main-content {
-            margin-left: 240px;
-            padding: 40px 30px;
-            min-height: 100vh;
-        }
-
-        .main-content h1 {
-            font-size: 26px;
-            color: #1a73e8;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            color: #888;
-            font-size: 14px;
-            margin-bottom: 35px;
-        }
-
-        /* ===== STATS CARDS ===== */
-        .stats-container {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-bottom: 40px;
-        }
-
-        .card {
-            background-color: white;
-            border-radius: 12px;
-            padding: 20px 25px;
-            flex: 1;
-            min-width: 140px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            text-align: center;
-            border-top: 4px solid #1a73e8;
-        }
-
-        .card h3 {
-            font-size: 12px;
-            color: #aaa;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-        }
-
-        .card p {
-            font-size: 30px;
-            font-weight: bold;
-            color: #1a73e8;
-        }
-
-        .card.best        { border-top-color: #4CAF50; }
-        .card.best p      { color: #4CAF50; }
-
-        .card.worst       { border-top-color: #e53935; }
-        .card.worst p     { color: #e53935; }
-
-        .card.level       { border-top-color: #ff9800; }
-        .card.level p     { color: #ff9800; font-size: 18px; padding-top: 6px; }
-
-        .card.predict     { border-top-color: #9c27b0; }
-        .card.predict p   { color: #9c27b0; }
-
-        .card.sessions    { border-top-color: #1a73e8; }
-
-        /* ===== TREND BADGE ===== */
-        .trend-container {
-            margin-bottom: 30px;
-        }
-
-        .trend {
-            display: inline-block;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .trend.improving { background-color: #e8f5e9; color: #4CAF50; }
-        .trend.declining { background-color: #ffebee; color: #e53935; }
-        .trend.stable    { background-color: #fff8e1; color: #ff9800; }
-
-        /* ===== CHART ===== */
-        .chart-container {
-            background-color: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-
-        .chart-container h2 {
-            font-size: 18px;
-            color: #333;
-            margin-bottom: 25px;
-        }
-
-        /* ===== EMPTY STATE ===== */
-        .empty-state {
-            text-align: center;
-            padding: 60px;
-            color: #aaa;
-        }
-
-        .empty-state p {
-            font-size: 16px;
-            margin-top: 10px;
-        }
-    </style>
 </head>
 <body>
 
 <!-- Sidebar -->
-<div class="sidebar">
+<button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+    <span></span>
+    <span></span>
+    <span></span>
+</button>
+
+<!-- 2. Overlay sombre -->
+<div class="overlay" id="overlay"></div>
+
+<!-- 3. Ta sidebar existante — ajoute juste l'id -->
+<div class="sidebar" id="sidebar">
     <div class="logo">🎮 AzerType</div>
     <a href="/azerType">🕹️ Play</a>
     <a href="/progression" class="active">📊 My Progression</a>
 </div>
+
+
 
 <!-- Main Content -->
 <div class="main-content">

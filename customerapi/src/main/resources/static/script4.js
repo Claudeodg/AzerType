@@ -46,28 +46,39 @@ function validatTheInputWord() {
     if (currentIndex < actualList.length) {
         showProposition(actualList[currentIndex]);
     } else {
-        // Game finished
-        showProposition(`Game finished! Your score: ${score}/${actualList.length}`);
-        input.disabled = true;
 
-        fetch("/score", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ score: score} )
-        }).then(response => {
-                  if (response.ok) {
-                      console.log("Score saved !");
-                  }
-              });
+            // Game finished
+            showProposition(`Game finished! Your score: ${score}/${actualList.length}`);
+            input.disabled = true;
 
-        // Show restart option after 2 seconds
-        setTimeout(() => {
-            if (confirm("Do you want to play again?")) {
-                startGame();
-            }
-        }, 2000);
+            // Save score — une seule fois
+            fetch("/score", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ score: score })
+            }).then(response => {
+                if (response.ok) {
+                    console.log("Score saved !");
+                }
+            });
+
+            // Show modal
+            document.getElementById('finalScore').innerText =
+                `${score}/${actualList.length}`;
+            document.getElementById('gameOverModal')
+                .classList.add('active');
+
+            // Play Again button
+            document.getElementById('btnPlayAgain')
+                .addEventListener('click', () => {
+                    document.getElementById('gameOverModal')
+                        .classList.remove('active');
+                    startGame();
+                });
+
     }
 }
+
 
 /**
  * Handle option change (Words or Sentences)
@@ -91,11 +102,11 @@ function startGame() {
     currentIndex = 0;
     
      let choosenWord = document.getElementById("word");
-    let choosenAI = document.getElementById("ai"); // ← récupère le radio AI
+    let choosenAI = document.getElementById("ai");
 
     // Select the appropriate list
     if (choosenAI && choosenAI.checked) {
-        // Mode AI — utilise le contenu généré par Gemini
+        // Mode AI
         if (generatedContent.length === 0) {
             alert("Please generate content with AI first.");
             return;
