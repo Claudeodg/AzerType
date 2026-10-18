@@ -1,5 +1,7 @@
 # AzerType – Tipp-Trainer mit KI
 
+[![CI](https://github.com/Claudeodg/AzerType/actions/workflows/ci.yml/badge.svg)](https://github.com/Claudeodg/AzerType/actions/workflows/ci.yml)
+
 Ein interaktiver Tipp-Trainer, der Wörter und Sätze generiert, den Score des Benutzers speichert und den Fortschritt mit einem Python-Microservice analysiert.
 
 ---
@@ -181,12 +183,33 @@ Die Anwendung läuft unter <http://localhost:8080>. Ist der Port belegt:
 
 ## Tests
 
+Die Tests decken die kritischen Pfade ab, keine 100-%-Abdeckung.
+
+**Spring Boot** (`customerapi/src/test`):
+
+- `SecurityConfigTest` (`@WebMvcTest` + MockMvc): öffentliche und geschützte Routen, `401` für `/score` ohne Session, Login, CSRF, Logout, Sprachwahl
+- `PageRenderingTest`: Spiel-, Fortschritts- und Fehlerseite auf Englisch und Deutsch, Statuscodes 404 und 500
+- `UserServiceTest` (Mockito): Passwort-Reset (Token-Hash, Sperrfrist, Ablauf, Beenden der Sessions)
+- `MessagesTest`: Englisch und Deutsch haben dieselben Texte
+- `CustomerapiApplicationTests` (`@SpringBootTest`): Start des gesamten Kontexts, braucht MySQL
+
 ```bash
 cd customerapi
 ./gradlew test
 ```
 
-Die Tests für Sicherheit, Passwort-Reset, Seitenanzeige und Übersetzungen laufen ohne Datenbank. Nur `CustomerapiApplicationTests` (Start des gesamten Kontexts) braucht eine laufende MySQL-Datenbank.
+**Python-Microservice** (`MicroService/tests`, pytest):
+
+- `test_analyzer.py`: `analyze()` direkt getestet (reine Funktion, keine Mocks): Statistiken, Trend, Prognose, Niveau-Grenzen
+- `test_app.py`: Endpunkte mit dem Flask-Testclient, inklusive ungültiger Eingaben (`400`)
+
+```bash
+cd MicroService
+pip install -r requirements-dev.txt
+pytest
+```
+
+**CI:** GitHub Actions (`.github/workflows/ci.yml`) führt beide Testsuiten bei jedem Push und Pull Request aus. Für den Spring-Boot-Job startet die Pipeline eine MySQL-Datenbank als Service-Container.
 
 ---
 

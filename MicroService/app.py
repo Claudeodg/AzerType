@@ -5,14 +5,28 @@ from analyzer import analyze
 
 app = Flask(__name__)
 
+
+def is_valid_score(item) -> bool:
+    """A score entry must be an object with a numeric "score" (booleans excluded)."""
+    if not isinstance(item, dict):
+        return False
+    score = item.get("score")
+    return isinstance(score, (int, float)) and not isinstance(score, bool)
+
+
 @app.route("/analyze", methods=["POST"])
 def analyze_scores():
-    data = request.get_json()
+    # silent=True: a missing or malformed JSON body gives None instead of an exception.
+    data = request.get_json(silent=True)
 
-    if not data or "scores" not in data:
+    if not isinstance(data, dict) or "scores" not in data:
         return jsonify({"error": "Missing scores"}), 400
 
-    result = analyze(data["scores"])
+    scores = data["scores"]
+    if not isinstance(scores, list) or not all(is_valid_score(item) for item in scores):
+        return jsonify({"error": "Invalid scores"}), 400
+
+    result = analyze(scores)
     return jsonify(result), 200
 
 @app.route("/health", methods=["GET"])
