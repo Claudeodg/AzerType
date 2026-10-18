@@ -1,16 +1,18 @@
-# 🎮 AzerType — Tipp-Trainer mit KI
+# AzerType – Tipp-Trainer mit KI
 
-Ein interaktiver Tipp-Trainer, der Wörter und Sätze generiert, den Score des Benutzers verwaltet und eine Fortschrittsanalyse mit Python und KI bietet.
-
----
-
-## 📌 Projektbeschreibung
-
-AzerType ist eine Full-Stack-Webanwendung, bei der der Benutzer Wörter oder Sätze abtippen muss, die auf dem Bildschirm erscheinen. Die Anwendung integriert die **Gemini AI API** zur automatischen Generierung von Inhalten, speichert Scores in einer **MySQL-Datenbank** und analysiert den Fortschritt des Benutzers über einen **Python-Microservice**.
+Ein interaktiver Tipp-Trainer, der Wörter und Sätze generiert, den Score des Benutzers speichert und den Fortschritt mit einem Python-Microservice analysiert.
 
 ---
 
-## 🏗️ Architektur
+## Projektbeschreibung
+
+AzerType ist eine Full-Stack-Webanwendung, bei der der Benutzer Wörter oder Sätze abtippt, die auf dem Bildschirm erscheinen. Die Anwendung nutzt die **Google Gemini API**, um Übungsinhalte zu generieren, speichert die Scores in einer **MySQL-Datenbank** und analysiert den Fortschritt über einen **Python-Microservice**.
+
+Die Oberfläche ist auf **Englisch und Deutsch** verfügbar; der Benutzer wählt die Sprache oben rechts (EN | DE).
+
+---
+
+## Architektur
 
 ```
 Browser (HTML/CSS/JS)
@@ -18,54 +20,84 @@ Browser (HTML/CSS/JS)
         ▼
 Spring Boot (Port 8080)
         │
-        ├── MySQL — Score- und Benutzerverwaltung
-        ├── Gemini API — KI-Generierung von Wörtern
+        ├── MySQL — Benutzer, Scores, Tokens zum Zurücksetzen des Passworts
+        ├── Gemini API — KI-Generierung von Wörtern und Sätzen
+        ├── SMTP (z. B. Gmail) — E-Mails zum Zurücksetzen des Passworts
         └── Python Flask (Port 5000) — Fortschrittsanalyse
 ```
 
+Der Gemini-API-Schlüssel bleibt auf dem Server: Das Frontend ruft `/api/gemini/generate` auf, und Spring Boot leitet die Anfrage an Gemini weiter.
+
 ---
 
-## ⚙️ Technologien
+## Technologien
 
 | Schicht | Technologie |
 |--------|-------------|
-| Backend | Java 17 · Spring Boot · Spring Security · Spring Data JPA |
-| Frontend | HTML · CSS · JavaScript · Thymeleaf · Chart.js |
+| Backend | Java 21 · Spring Boot 4 · Spring Security · Spring Data JPA · Spring Mail |
+| Frontend | Thymeleaf · HTML · CSS · JavaScript · Chart.js |
 | Datenbank | MySQL |
 | KI | Google Gemini API |
 | Microservice | Python 3 · Flask · NumPy · Scikit-learn |
+| Build & Tests | Gradle · JUnit 5 · Mockito · MockMvc |
 
 ---
 
-## 🚀 Funktionen
+## Funktionen
 
-- ✅ Benutzerregistrierung und Login (BCrypt-Verschlüsselung)
-- ✅ Tipp-Spiel mit Wörtern, Sätzen oder KI-generierten Inhalten
-- ✅ Score-Speicherung nach jeder Partie
-- ✅ Fortschrittsseite mit interaktivem Diagramm (Chart.js)
-- ✅ Python-Microservice für statistische Analyse :
-  - Bester / schlechtester Score
+- Startseite mit einer Tipp-Demo, die ohne Konto funktioniert
+- Registrierung, Login und Logout mit Spring Security (Passwörter mit BCrypt gehasht)
+- Passwort vergessen: Link per E-Mail, 30 Minuten gültig, nur einmal verwendbar
+- Tipp-Spiel mit Wörtern, Sätzen oder KI-generierten Inhalten
+- Score-Speicherung nach jeder Partie
+- Fortschrittsseite mit Kennzahlen und Diagramm (Chart.js)
+- Oberfläche und E-Mails auf Englisch und Deutsch
+- Python-Microservice für die statistische Analyse:
+  - Bester / niedrigster Score
   - Durchschnitt
-  - Trend (verbessernd / sinkend / stabil)
-  - Score-Vorhersage für die nächsten 7 Tage
-  - Spielerniveau (Anfänger / Mittelstufe / Fortgeschritten)
+  - Trend (steigend / fallend / stabil)
+  - Score-Prognose für die nächsten 7 Tage
+  - Spielerniveau (Anfänger / Fortgeschritten / Experte)
 
 ---
 
-## 🗂️ Projektstruktur
+## Sicherheit
+
+- Alle Seiten außer Startseite, Login, Registrierung und Passwort-Reset erfordern eine Anmeldung.
+- CSRF-Schutz für alle Formulare und `fetch()`-Aufrufe.
+- Die Session-ID wird beim Login erneuert (Schutz gegen Session Fixation).
+- Passwort-Reset:
+  - In der Datenbank wird nur der SHA-256-Hash des Tokens gespeichert.
+  - Höchstens eine Reset-E-Mail alle 2 Minuten pro Konto.
+  - Die Antwort ist immer gleich, egal ob die E-Mail-Adresse registriert ist oder nicht.
+  - Nach dem Zurücksetzen werden alle offenen Sessions des Benutzers beendet.
+- Keine Geheimnisse im Code: Datenbank-Passwort, Gemini-Schlüssel und SMTP-Zugangsdaten kommen aus Umgebungsvariablen oder aus der lokalen, von Git ignorierten Datei `application-local.properties`.
+
+---
+
+## Projektstruktur
 
 ```
 AzerType/
-├── src/main/java/claudodg/customerapi/
-│   ├── controller/        # Spring MVC Controller
-│   ├── entity/            # JPA Entitäten (User, Score)
-│   ├── repository/        # Spring Data Repositories
-│   ├── service/           # Business-Logik
-│   └── security/          # Spring Security Konfiguration
-├── src/main/resources/
-│   ├── templates/         # Thymeleaf HTML-Seiten
-│   └── static/            # CSS, JavaScript
-└── MicroService/          # Python Flask Microservice
+├── customerapi/                         # Spring-Boot-Anwendung
+│   ├── build.gradle
+│   ├── .env.example                     # Liste der Umgebungsvariablen
+│   └── src/
+│       ├── main/java/claudodg/customerapi/
+│       │   ├── config/                  # Sprache (EN/DE)
+│       │   ├── controller/              # Spring MVC Controller, Fehlerseite
+│       │   ├── entity/                  # JPA-Entitäten (User, Score, PasswordResetToken)
+│       │   ├── reposotorie/             # Spring Data Repositories
+│       │   ├── security/                # Spring Security Konfiguration
+│       │   └── service/                 # Business-Logik, E-Mail, Analyse
+│       ├── main/resources/
+│       │   ├── application.properties
+│       │   ├── messages.properties      # Texte auf Englisch
+│       │   ├── messages_de.properties   # Texte auf Deutsch
+│       │   ├── templates/               # Thymeleaf-Seiten
+│       │   └── static/                  # CSS, JavaScript
+│       └── test/                        # JUnit-Tests
+└── MicroService/                        # Python-Flask-Microservice
     ├── app.py
     ├── analyzer.py
     └── requirements.txt
@@ -73,38 +105,53 @@ AzerType/
 
 ---
 
-## 🛠️ Installation
+## Installation
 
 ### Voraussetzungen
 
-- Java 17+
-- Maven
+- Java 21+ (Gradle wird über den mitgelieferten Wrapper `gradlew` geladen)
 - MySQL
 - Python 3.10+
+- Ein Google-Gemini-API-Schlüssel
+- Ein SMTP-Konto für die Reset-E-Mails (bei Gmail ein App-Passwort, siehe unten)
 
-### 1. Datenbank konfigurieren
+### 1. Datenbank anlegen
 
 ```sql
-CREATE DATABASE azertype;
+CREATE DATABASE customerapi;
 ```
 
-In `application.properties` :
+Die Tabellen werden beim ersten Start automatisch erstellt (`spring.jpa.hibernate.ddl-auto=update`).
+
+### 2. Konfiguration
+
+Die Werte werden über Umgebungsvariablen gesetzt. Die vollständige Liste steht in `customerapi/.env.example`.
+
+| Variable | Beschreibung | Standardwert |
+|----------|--------------|--------------|
+| `DB_URL` | JDBC-URL der Datenbank | `jdbc:mysql://localhost:3306/customerapi` |
+| `DB_USERNAME` | Datenbank-Benutzer | `root` |
+| `DB_PASSWORD` | Datenbank-Passwort | leer |
+| `GEMINI_API_KEY` | Gemini-API-Schlüssel | **erforderlich** |
+| `MAIL_USERNAME` | SMTP-Benutzer (z. B. Gmail-Adresse) | **erforderlich** |
+| `MAIL_PASSWORD` | SMTP-Passwort | **erforderlich** |
+| `MAIL_HOST` / `MAIL_PORT` | SMTP-Server | `smtp.gmail.com` / `587` |
+| `PYTHON_SERVICE_URL` | Adresse des Microservice | `http://localhost:5000` |
+| `APP_BASE_URL` | Öffentliche Adresse der Anwendung (für Links in E-Mails) | `http://localhost:<server.port>` |
+
+**Lokale Entwicklung:** Statt Umgebungsvariablen kannst du die Datei `customerapi/src/main/resources/application-local.properties` anlegen. Sie wird automatisch geladen (Profil `local`) und von Git ignoriert:
 
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/azertype
-spring.datasource.username=DEIN_BENUTZERNAME
+spring.datasource.username=root
 spring.datasource.password=DEIN_PASSWORT
-spring.jpa.hibernate.ddl-auto=update
-python.service.url=http://localhost:5000
+gemini.api.key=DEIN_GEMINI_SCHLUESSEL
+spring.mail.username=deine.adresse@gmail.com
+spring.mail.password=DEIN_APP_PASSWORT
 ```
 
-### 2. Spring Boot starten
+**Gmail:** Gmail akzeptiert für SMTP nicht dein normales Passwort. Aktiviere die Bestätigung in zwei Schritten und erstelle unter <https://myaccount.google.com/apppasswords> ein App-Passwort (16 Zeichen).
 
-```bash
-mvn spring-boot:run
-```
-
-### 3. Python Microservice starten
+### 3. Python-Microservice starten
 
 ```bash
 cd MicroService
@@ -115,50 +162,87 @@ pip install -r requirements.txt
 python app.py
 ```
 
+Der Debug-Modus von Flask ist standardmäßig aus. Für die Entwicklung: `FLASK_DEBUG=1`.
+
+### 4. Spring Boot starten
+
+```bash
+cd customerapi
+./gradlew bootRun           # Windows: .\gradlew bootRun
+```
+
+Die Anwendung läuft unter <http://localhost:8080>. Ist der Port belegt:
+
+```bash
+./gradlew bootRun --args="--server.port=8081"
+```
+
 ---
 
-## 🌐 Verfügbare Routen
+## Tests
 
-| Route | Methode | Beschreibung |
-|-------|---------|--------------|
-| `/auth/register` | GET/POST | Registrierung |
-| `/auth/login` | GET/POST | Anmeldung |
-| `/azerType` | GET | Spielseite |
-| `/score` | POST | Score speichern |
-| `/progression` | GET | Fortschrittsseite |
+```bash
+cd customerapi
+./gradlew test
+```
+
+Die Tests für Sicherheit, Passwort-Reset, Seitenanzeige und Übersetzungen laufen ohne Datenbank. Nur `CustomerapiApplicationTests` (Start des gesamten Kontexts) braucht eine laufende MySQL-Datenbank.
 
 ---
 
-## 📊 Python Microservice
+## Verfügbare Routen
 
-Der Microservice empfängt Scores von Spring Boot per HTTP POST und gibt statistische Analysen zurück.
+| Route | Methode | Zugriff | Beschreibung |
+|-------|---------|---------|--------------|
+| `/` | GET | öffentlich | Startseite mit Tipp-Demo |
+| `/auth/register` | GET/POST | öffentlich | Registrierung |
+| `/auth/login` | GET/POST | öffentlich | Anmeldung |
+| `/auth/logout` | POST | angemeldet | Abmeldung |
+| `/auth/forgot-password` | GET/POST | öffentlich | Reset-Link anfordern |
+| `/auth/reset-password` | GET/POST | öffentlich (mit Token) | Neues Passwort festlegen |
+| `/azerType` | GET | angemeldet | Spielseite |
+| `/progression` | GET | angemeldet | Fortschrittsseite |
+| `/score` | POST | angemeldet | Score speichern (JSON) |
+| `/api/gemini/generate` | POST | angemeldet | Proxy zur Gemini API |
 
-**Eingabe :**
+Jede Seite akzeptiert `?lang=en` oder `?lang=de`. Die Wahl wird ein Jahr lang in einem Cookie gespeichert.
+
+---
+
+## Python-Microservice
+
+Der Microservice empfängt die Scores von Spring Boot per HTTP POST auf `/analyze` und gibt eine statistische Analyse zurück. Unter `/health` antwortet er mit `{"status": "ok"}`.
+
+**Eingabe:**
 ```json
 {
   "scores": [
-    { "score": 10, "played_at": "2026-01-01" },
-    { "score": 18, "played_at": "2026-01-02" }
+    { "score": 10, "played_at": "2026-01-01T10:00:00" },
+    { "score": 18, "played_at": "2026-01-02T18:30:00" }
   ]
 }
 ```
 
-**Ausgabe :**
+**Ausgabe:**
 ```json
 {
   "best_score": 18,
   "worst_score": 10,
   "average_score": 14.0,
   "trend": "improving",
-  "predicted_7days": 26.0,
+  "slope": 8.0,
+  "predicted_7days": 82.0,
   "level": "beginner",
-  "total_sessions": 2
+  "total_sessions": 2,
+  "scores": [ ... ]
 }
 ```
 
+Bei weniger als zwei Scores antwortet der Dienst mit `{"error": "Not enough data"}`.
+
 ---
 
-## 👤 Autor
+## Autor
 
-**claudodg** — Full Stack Developer in Ausbildung  
-Projekt erstellt mit Spring Boot, Python und Google Gemini API.
+**claudodg** – Full-Stack-Entwickler in Ausbildung
+Projekt erstellt mit Spring Boot, Python und der Google Gemini API.

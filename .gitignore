@@ -1,0 +1,10 @@
+# Python virtual environments (recreate with: python -m venv venv && pip install -r requirements.txt)
+venv/
+.venv/
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Secrets
+.env

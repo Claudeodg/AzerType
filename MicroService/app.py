@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, request, jsonify
 from analyzer import analyze
 
@@ -18,4 +20,5 @@ def health():
     return jsonify({"status": "ok"}), 200
 
 if __name__ == "__main__":
-    app.run(port=5000, debug=True)
+    # Never enable debug in production: the Werkzeug debugger allows remote code execution.
+    app.run(port=5000, debug=os.environ.get("FLASK_DEBUG") == "1")
