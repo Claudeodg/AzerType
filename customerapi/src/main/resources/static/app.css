@@ -1,0 +1,530 @@
+/* Logged-in pages: practice (azerType.html) and progress (progression.html).
+   Colors and fonts come from topbar.css. */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--topbar-height);
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    line-height: 1.5;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+.muted {
+    color: var(--muted);
+}
+
+.small {
+    font-size: 14px;
+}
+
+/* --- Page layout --- */
+
+.page {
+    flex: 1;
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 24px 56px;
+}
+
+.page-narrow {
+    max-width: 720px;
+}
+
+.page-header {
+    margin-bottom: 24px;
+}
+
+.page-header-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 28px;
+    letter-spacing: -0.02em;
+}
+
+.page-subtitle {
+    margin: 4px 0 0;
+    color: var(--muted);
+}
+
+.card {
+    padding: 24px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background-color: var(--surface);
+}
+
+.card-title {
+    margin: 0 0 16px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.footer {
+    padding: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+    text-align: center;
+}
+
+/* --- Buttons and form fields --- */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 18px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: var(--brand);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: var(--brand-dark);
+}
+
+.btn-secondary {
+    background-color: var(--surface);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+.btn-secondary:hover {
+    border-color: #a1a1aa;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.btn:focus-visible,
+input:focus-visible,
+select:focus-visible,
+summary:focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 2px;
+}
+
+input[type="text"],
+input[type="number"],
+select {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background-color: var(--surface);
+    color: var(--text);
+    font: inherit;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+    outline: none;
+    border-color: var(--text);
+}
+
+/* --- Practice page --- */
+
+.segmented {
+    display: inline-flex;
+    margin: 0 0 20px;
+    padding: 3px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background-color: var(--bg);
+}
+
+.segmented input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.segmented label {
+    padding: 7px 16px;
+    border-radius: 7px;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.segmented input:checked + label {
+    background-color: var(--surface);
+    color: var(--text);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.segmented input:focus-visible + label {
+    outline: 2px solid var(--text);
+    outline-offset: 1px;
+}
+
+.ai-panel {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background-color: var(--bg);
+}
+
+.ai-panel[hidden] {
+    display: none;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1 1 130px;
+}
+
+.field-small {
+    flex: 0 1 90px;
+}
+
+.field label {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.ai-status {
+    flex-basis: 100%;
+    margin: 0;
+    min-height: 1.5em;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.ai-status:empty {
+    display: none;
+}
+
+.ai-status-ok {
+    color: var(--ok);
+}
+
+.ai-status-error {
+    color: var(--error);
+}
+
+.game-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+}
+
+.progress-bar {
+    height: 4px;
+    margin: 8px 0 24px;
+    border-radius: 2px;
+    background-color: var(--brand-soft);
+    overflow: hidden;
+}
+
+.progress-bar div {
+    width: 0;
+    height: 100%;
+    background-color: var(--brand);
+    transition: width 0.2s ease;
+}
+
+.proposition {
+    min-height: 120px;
+    margin: 0 0 20px;
+    padding: 28px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background-color: var(--bg);
+    font-family: var(--mono);
+    font-size: clamp(20px, 3.5vw, 30px);
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+.answer-row {
+    display: flex;
+    gap: 10px;
+}
+
+.answer-row input {
+    flex: 1;
+    min-width: 0;
+    font-family: var(--mono);
+    font-size: 17px;
+}
+
+.feedback {
+    min-height: 1.5em;
+    margin: 12px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.feedback-ok {
+    color: var(--ok);
+}
+
+.feedback-ok::before {
+    content: "✓ ";
+}
+
+.feedback-error {
+    color: var(--error);
+}
+
+.feedback-error::before {
+    content: "✕ ";
+}
+
+/* End of game dialog */
+
+.dialog {
+    width: min(400px, calc(100% - 32px));
+    padding: 32px 28px 24px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background-color: var(--surface);
+    color: var(--text);
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+}
+
+.dialog::backdrop {
+    background-color: rgba(24, 24, 27, 0.4);
+}
+
+.dialog h2 {
+    margin: 0 0 16px;
+    font-size: 20px;
+}
+
+.dialog p {
+    margin: 0;
+}
+
+.final-score {
+    margin: 4px 0 8px !important;
+    font-size: 48px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+/* --- Progress page --- */
+
+.trend-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background-color: var(--surface);
+    font-size: 14px;
+}
+
+.trend-improving strong,
+.trend-improving span[aria-hidden] {
+    color: var(--ok);
+}
+
+.trend-declining strong,
+.trend-declining span[aria-hidden] {
+    color: var(--error);
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.stat {
+    padding: 18px 20px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background-color: var(--surface);
+}
+
+.stat p {
+    margin: 0;
+}
+
+.stat-label {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.stat-value {
+    margin-top: 4px !important;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.stat-value-text {
+    font-size: 22px;
+    line-height: 1.6;
+}
+
+.chart-wrap {
+    position: relative;
+    height: 300px;
+}
+
+.data-table {
+    margin-top: 16px;
+    font-size: 14px;
+}
+
+.data-table summary {
+    color: var(--muted);
+    cursor: pointer;
+}
+
+.data-table table {
+    width: 100%;
+    margin-top: 12px;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+}
+
+.data-table th,
+.data-table td {
+    padding: 8px 4px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+}
+
+.data-table th {
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.empty-state {
+    padding: 48px 24px;
+    text-align: center;
+}
+
+.empty-state h2 {
+    margin: 0 0 6px;
+    font-size: 18px;
+}
+
+.empty-state p {
+    margin: 0 0 20px;
+}
+
+/* --- Small screens --- */
+
+@media (max-width: 640px) {
+    .page {
+        padding: 24px 16px 40px;
+    }
+
+    .card {
+        padding: 18px;
+    }
+
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stat-value {
+        font-size: 24px;
+    }
+
+    .answer-row {
+        flex-direction: column;
+    }
+
+    .chart-wrap {
+        height: 240px;
+    }
+}
+
+/* --- Error page --- */
+
+.error-state {
+    margin-top: 24px;
+    padding: 56px 24px;
+}
+
+.error-state h1 {
+    margin: 0 0 8px;
+    font-size: 24px;
+    letter-spacing: -0.02em;
+}
+
+.error-code {
+    margin: 0 0 12px !important;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+}
+
+.error-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{home.title}">AzerType – Learn to type faster</title>
+    <link rel="stylesheet" th:href="@{/topbar.css}">
+    <link rel="stylesheet" th:href="@{/home.css}">
+    <script th:src="@{/language.js}" defer></script>
+    <script th:src="@{/home.js}" defer></script>
+</head>
+<body>
+
+<div th:replace="~{fragments/topbar :: topbar('home')}"></div>
+
+<main>
+    <!-- Hero: pitch on the left, typing demo on the right -->
+    <section class="hero">
+        <div class="hero-text">
+            <span class="badge" th:text="#{home.hero.badge}">Free typing trainer</span>
+            <h1 th:text="#{home.hero.title}">Type faster. Make fewer mistakes.</h1>
+            <p class="hero-subtitle" th:text="#{home.hero.subtitle}">AzerType helps you improve your typing speed.</p>
+            <div class="hero-actions" th:unless="${loggedIn}">
+                <a th:href="@{/auth/register}" class="btn btn-primary" th:text="#{home.hero.cta}">Create a free account</a>
+                <a th:href="@{/auth/login}" class="btn btn-link" th:text="#{home.hero.secondary}">I already have an account</a>
+            </div>
+            <div class="hero-actions" th:if="${loggedIn}">
+                <a th:href="@{/azerType}" class="btn btn-primary" th:text="#{nav.play}">Play</a>
+            </div>
+        </div>
+
+        <!-- Trial: works without an account, nothing is saved -->
+        <section class="demo" id="demo" aria-labelledby="demo-title">
+            <div class="demo-header">
+                <h2 id="demo-title" th:text="#{home.demo.title}">Try it now</h2>
+                <button type="button" class="btn-restart" id="demoRestart" th:text="#{home.demo.restart}">New sentence</button>
+            </div>
+            <p class="demo-hint" th:text="#{home.demo.hint}">Type the sentence below.</p>
+
+            <p class="demo-text" id="demoText" aria-live="off"></p>
+
+            <label for="demoInput" class="visually-hidden" th:text="#{home.demo.inputLabel}">Your text</label>
+            <input type="text" id="demoInput" class="demo-input" autocomplete="off" autocapitalize="off"
+                   spellcheck="false" th:placeholder="#{home.demo.placeholder}" placeholder="Start typing here…">
+
+            <dl class="demo-stats">
+                <div>
+                    <dt th:text="#{home.demo.wpm}">Words / min</dt>
+                    <dd id="demoWpm">0</dd>
+                </div>
+                <div>
+                    <dt th:text="#{home.demo.accuracy}">Accuracy</dt>
+                    <dd><span id="demoAccuracy">100</span> %</dd>
+                </div>
+                <div>
+                    <dt th:text="#{home.demo.time}">Time</dt>
+                    <dd><span id="demoTime">0.0</span> s</dd>
+                </div>
+            </dl>
+
+            <div class="demo-result" id="demoResult" role="status" hidden>
+                <strong th:text="#{home.demo.done}">Well done!</strong>
+                <span th:unless="${loggedIn}">
+                    <a th:href="@{/auth/register}" th:text="#{home.demo.saveHint}">Sign up to save your scores.</a>
+                </span>
+            </div>
+        </section>
+    </section>
+
+    <!-- Features -->
+    <section class="features" aria-labelledby="features-title">
+        <h2 id="features-title" th:text="#{home.features.title}">Why AzerType?</h2>
+        <div class="feature-grid">
+            <article class="feature">
+                <div class="feature-icon" aria-hidden="true">🤖</div>
+                <h3 th:text="#{home.feature.modes.title}">Words, sentences or AI</h3>
+                <p th:text="#{home.feature.modes.text}">Practise with word lists, sentences or AI texts.</p>
+            </article>
+            <article class="feature">
+                <div class="feature-icon" aria-hidden="true">📈</div>
+                <h3 th:text="#{home.feature.progress.title}">Track your progress</h3>
+                <p th:text="#{home.feature.progress.text}">Every game is saved.</p>
+            </article>
+            <article class="feature">
+                <div class="feature-icon" aria-hidden="true">⚡</div>
+                <h3 th:text="#{home.feature.free.title}">Free and simple</h3>
+                <p th:text="#{home.feature.free.text}">Nothing to install.</p>
+            </article>
+        </div>
+    </section>
+</main>
+
+<footer class="footer">
+    <p th:text="#{home.footer}">AzerType – typing trainer</p>
+</footer>
+
+</body>
+</html>

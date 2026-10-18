@@ -1,167 +1,93 @@
+// AI mode: generates a word or sentence list with Google Gemini.
+// The request goes through our backend (/api/gemini/generate), which holds the API key.
 
-// Global variable to store generated words/sentences
 let generatedContent = [];
-let isGeneratingFromAI = false;
 
 /**
- * Function to get words or sentences from Gemini AI
+ * Asks Gemini for a list of words or sentences.
  * @param {string} type - 'words' or 'sentences'
- * @param {number} count - Number of items to generate
- * @param {string} theme - Theme for generation (optional)
- * @param {string} level - Difficulty level: 'easy', 'medium', 'hard'
- * @returns {Promise<Array>} Array of words or sentences
+ * @param {number} count - number of items to generate
+ * @param {string} theme - topic of the items
+ * @param {string} level - 'easy', 'medium' or 'hard'
+ * @returns {Promise<string[]>} the generated items
+ * @throws {Error} if the request fails or the answer is empty
  */
-async function getContentFromGemini(type = 'words', count = 10, theme = 'general', level = 'medium') {
-    try {
-        let prompt;
-        
-        if (type === 'words') {
-            prompt = `Generate exactly ${count} words in English  or German about the theme "${theme}" with a difficulty level of ${level}.
-            - For easy level: use short common words (3-6 letters)
-            - For medium level: use everyday words (5-8 letters)
-            - For hard level: use longer, more complex words (8+ letters)
-            Reply ONLY with the words separated by commas, no numbering or explanation.
-            Example: chat, maison, soleil, arbre`;
-        } else {
-            prompt = `Generate exactly ${count} sentences in english or in german about the theme "${theme}" with a difficulty level of ${level}.
-            - For easy level: use short simple sentences (5-8 words)
-            - For medium level: use medium sentences (8-12 words)
-            - For hard level: use longer, complex sentences (12+ words)
-            Reply ONLY with the sentences separated by a pipe character (|), no numbering or explanation.
-            Example: Le chat dort sur le canapé.|La maison est grande et belle.`;
-        }
-        
-        const response =await fetch("/api/gemini/generate", {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-                        });
+async function getContentFromGemini(type = "words", count = 10, theme = "general", level = "medium") {
+    const language = LANG === "de" ? "German" : "English";
+    let prompt;
 
-
-        if (!response.ok) {
-            throw new Error(`API Error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const text = data.candidates[0].content.parts[0].text;
-        
-        // Clean and extract content
-        let items;
-        if (type === 'words') {
-            items = text
-                .split(',')
-                .map(word => word.trim())
-                .filter(word => word.length > 0);
-        } else {
-            items = text
-                .split('|')
-                .map(sentence => sentence.trim())
-                .filter(sentence => sentence.length > 0);
-        }
-        
-        return items;
-        
-    } catch (error) {
-        console.error('Error during generation:', error);
-        
+    if (type === "words") {
+        prompt = `Generate exactly ${count} ${language} words about the topic "${theme}" with a difficulty level of ${level}.
+        - Easy: short common words (3-6 letters)
+        - Medium: everyday words (5-8 letters)
+        - Hard: longer, more complex words (8+ letters)
+        Reply ONLY with the words separated by commas, without numbering or explanation.`;
+    } else {
+        prompt = `Generate exactly ${count} ${language} sentences about the topic "${theme}" with a difficulty level of ${level}.
+        - Easy: short simple sentences (5-8 words)
+        - Medium: medium sentences (8-12 words)
+        - Hard: longer, complex sentences (12+ words)
+        Reply ONLY with the sentences separated by a pipe character (|), without numbering or explanation.`;
     }
+
+    const response = await fetch("/api/gemini/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...getCsrfHeader() },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+    });
+
+    if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+
+    const items = text
+        .split(type === "words" ? "," : "|")
+        .map((item) => item.trim())
+        .filter((item) => item.length > 0);
+
+    if (items.length === 0) {
+        throw new Error("Empty answer from Gemini");
+    }
+    return items;
 }
 
-/**
- * Add a button to generate content from AI in the interface
- */
-function addAIButton() {
-    const aiRadio = document.getElementById('ai');
-    const aiPanel = document.getElementById('aiPanel');
+/** Shows the AI options in AI mode and handles the Generate button. */
+function initAIPanel() {
+    const aiRadio = document.getElementById("ai");
+    const aiPanel = document.getElementById("aiPanel");
+    const button = document.getElementById("btnGenerateAI");
+    const status = document.getElementById("aiStatus");
 
-    if (!aiRadio || !aiPanel) {
-        console.error(' Element "ai" or "aiPanel" not found in the DOM');
-        return;
-    }
-
-    // Show/hide AI panel based on selected radio
-    document.querySelectorAll('input[name="optionSource"]').forEach(radio => {
-        radio.addEventListener('change', () => {
-            if (aiRadio.checked) {
-                aiPanel.style.display = 'block';
-            } else {
-                aiPanel.style.display = 'none';
-            }
+    document.querySelectorAll('input[name="optionSource"]').forEach((radio) => {
+        radio.addEventListener("change", () => {
+            aiPanel.hidden = !aiRadio.checked;
         });
     });
 
-    // Generate button
-    const btnGenerate = document.getElementById('btnGenerateAI');
-    if (!btnGenerate) {
-        console.error('Button "btnGenerateAI" not found in the DOM');
-        return;
-    }
+    button.addEventListener("click", async () => {
+        const type = document.getElementById("aiType").value;
+        const theme = document.getElementById("aiTheme").value;
+        const level = document.getElementById("aiLevel").value;
+        const count = parseInt(document.getElementById("aiCount").value, 10) || 10;
 
-    btnGenerate.addEventListener('click', async () => {
-        const type = document.getElementById('aiType').value;
-        const theme = document.getElementById('aiTheme').value;
-        const level = document.getElementById('aiLevel').value;
-        const count = parseInt(document.getElementById('aiCount').value);
-        const statusSpan = document.getElementById('aiStatus');
-        const button = document.getElementById('btnGenerateAI');
-
-        // Loading state
-        statusSpan.textContent = '⏳ Generating...';
-        statusSpan.style.color = 'black';
+        status.textContent = t("generating");
+        status.className = "ai-status";
         button.disabled = true;
 
         try {
-            // Call Gemini API
             generatedContent = await getContentFromGemini(type, count, theme, level);
-
-            const isWords = type === 'words';
-
-            // Update the correct list
-            if (typeof updateListFromAI === 'function') {
-                updateListFromAI(generatedContent, isWords);
-            } else if (isWords && typeof wordList !== 'undefined') {
-                wordList = generatedContent;
-            } else if (!isWords && typeof listePhrases !== 'undefined') {
-                listePhrases = generatedContent;
-            }
-
-            // Success message
-            statusSpan.textContent = ` ${generatedContent.length} items generated!`;
-            statusSpan.style.color = 'green';
-
-            // Restart the game with new content
-            if (typeof lancerJeu === 'function') {
-                lancerJeu();
-            }
-
+            status.textContent = t("generated", generatedContent.length);
+            status.className = "ai-status ai-status-ok";
+            startGame();
         } catch (error) {
-            console.error('Generation error:', error);
-            statusSpan.textContent = 'Error during generation';
-            statusSpan.style.color = 'red';
+            console.error("Generation error:", error);
+            status.textContent = t("generationError");
+            status.className = "ai-status ai-status-error";
         } finally {
             button.disabled = false;
-
-            // Clear status after 3 seconds
-            setTimeout(() => {
-                statusSpan.textContent = '';
-            }, 3000);
         }
     });
 }
-
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', addAIButton);
-} else {
-    addAIButton();
-}
-// Initialize AI button when DOM is loaded
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', addAIButton);
-} else {
-    addAIButton();
-}
-
-// Export functions for use in other scripts
-window.getContentFromGemini = getContentFromGemini;
-window.generatedContent = generatedContent;

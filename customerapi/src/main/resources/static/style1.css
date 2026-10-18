@@ -1,18 +1,26 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f2f5;
+    font-family: var(--font, Arial, sans-serif);
+    background-color: var(--bg, #fafafa);
+    color: var(--text, #18181b);
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
+    margin: 0;
+    /* Leaves room for the fixed top bar (topbar.css). */
+    padding: calc(var(--topbar-height, 64px) + 16px) 16px 16px;
+    box-sizing: border-box;
 }
 
 .login-container {
     background-color: white;
     padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    width: 300px;
+    border: 1px solid var(--border, #e4e4e7);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.04);
+    width: 100%;
+    max-width: 340px;
+    box-sizing: border-box;
     text-align: center;
 }
 
@@ -20,25 +28,60 @@ body {
     width: 90%;
     padding: 10px;
     margin: 10px 0;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+    border-radius: 8px;
+    border: 1px solid var(--border, #e4e4e7);
+    font: inherit;
+}
+
+.login-container input:focus {
+    outline: none;
+    border-color: var(--text, #18181b);
 }
 
 .login-container button {
     width: 95%;
     padding: 10px;
-    background-color: #4CAF50;
+    background-color: var(--brand, #18181b);
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
+    font: inherit;
+    font-weight: 600;
     cursor: pointer;
 }
 
 .login-container button:hover {
-    background-color: #45a049;
+    background-color: var(--brand-dark, #3f3f46);
 }
 
 .login-container a {
-    color: #4CAF50;
-    text-decoration: none;
+    color: var(--text, #18181b);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.login-container .show-password {
+    display: block;
+    text-align: left;
+    font-size: 0.85em;
+    color: #555;
+    margin: -4px 0 10px 4px;
+}
+
+.login-container .show-password input {
+    width: auto;
+    margin: 0 6px 0 0;
+    vertical-align: middle;
+}
+.login-container .form-error {
+    color: var(--error, #b91c1c);
+}
+
+.login-container .form-message {
+    color: var(--ok, #15803d);
+}
+
+.login-container .form-intro {
+    color: var(--muted, #71717a);
+    font-size: 0.9em;
 }

@@ -1,0 +1,203 @@
+/*
+ * Shared design tokens + top bar (templates/fragments/topbar.html).
+ * Neutral palette: near-black text and buttons on white / light gray.
+ * Color is only used for meaning (correct = green, wrong = red).
+ */
+
+:root {
+    --brand: #18181b;
+    --brand-dark: #3f3f46;
+    --brand-soft: #f4f4f5;
+    --text: #18181b;
+    --muted: #71717a;
+    --border: #e4e4e7;
+    --surface: #ffffff;
+    --bg: #fafafa;
+    --ok: #15803d;
+    --ok-soft: #f0fdf4;
+    --error: #b91c1c;
+    --error-soft: #fef2f2;
+    --radius: 10px;
+    --font: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --mono: 'Consolas', 'SFMono-Regular', 'Courier New', monospace;
+    --topbar-height: 60px;
+}
+
+.topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    height: var(--topbar-height);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background-color: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font);
+    box-sizing: border-box;
+}
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    min-width: 0;
+}
+
+.topbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+}
+
+.topbar-logo-icon {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background-color: var(--brand);
+    color: #fff;
+    font-size: 16px;
+}
+
+.topbar-nav {
+    display: flex;
+    gap: 4px;
+}
+
+.topbar-nav a {
+    padding: 7px 12px;
+    border-radius: 8px;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.topbar-nav a:hover {
+    color: var(--text);
+    background-color: var(--brand-soft);
+}
+
+.topbar-nav a.active {
+    color: var(--text);
+    background-color: var(--brand-soft);
+    font-weight: 600;
+}
+
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.lang-switch {
+    display: flex;
+    padding: 3px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background-color: var(--bg);
+}
+
+.lang-switch a {
+    padding: 4px 9px;
+    border-radius: 6px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.lang-switch a:hover {
+    color: var(--text);
+}
+
+.lang-switch a.active {
+    background-color: var(--surface);
+    color: var(--text);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.topbar-btn {
+    display: inline-block;
+    padding: 8px 14px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.topbar-btn-ghost {
+    background-color: var(--surface);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+.topbar-btn-ghost:hover {
+    border-color: #a1a1aa;
+}
+
+.topbar-btn-primary {
+    background-color: var(--brand);
+    color: #fff;
+}
+
+.topbar-btn-primary:hover {
+    background-color: var(--brand-dark);
+}
+
+.topbar-logout {
+    margin: 0;
+}
+
+.topbar a:focus-visible,
+.topbar button:focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+    .topbar {
+        padding: 0 12px;
+        gap: 8px;
+    }
+
+    .topbar-left {
+        gap: 8px;
+    }
+
+    .topbar-logo-text {
+        display: none;
+    }
+
+    .topbar-nav a {
+        padding: 6px 8px;
+        font-size: 13px;
+    }
+
+    .topbar-actions {
+        gap: 6px;
+    }
+
+    .topbar-btn {
+        padding: 7px 10px;
+        font-size: 13px;
+    }
+}

@@ -1,135 +1,176 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" lang="en">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>My Progression</title>
-    <link rel="stylesheet" th:href="@{/styleOfProgression.css}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script th:src="@{/scriptSidebar.js}" defer></script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{progress.pageTitle}">AzerType – Progress</title>
+    <link rel="stylesheet" th:href="@{/topbar.css}">
+    <link rel="stylesheet" th:href="@{/app.css}">
+    <script th:src="@{/language.js}" defer></script>
 </head>
 <body>
 
-<!-- Sidebar -->
-<button class="hamburger" id="hamburgerBtn" aria-label="Menu">
-    <span></span>
-    <span></span>
-    <span></span>
-</button>
+<div th:replace="~{fragments/topbar :: topbar('progress')}"></div>
 
-<!-- 2. Overlay sombre -->
-<div class="overlay" id="overlay"></div>
+<main class="page"
+      th:with="hasData=${serviceUnavailable == null and analysis['error'] == null and analysis['scores'] != null}">
 
-<!-- 3. Ta sidebar existante — ajoute juste l'id -->
-<div class="sidebar" id="sidebar">
-    <div class="logo">🎮 AzerType</div>
-    <a href="/azerType">🕹️ Play</a>
-    <a href="/progression" class="active">📊 My Progression</a>
-</div>
-
-
-
-<!-- Main Content -->
-<div class="main-content">
-
-    <h1>📈 My Progression</h1>
-    <p class="subtitle">Track your performance over time</p>
-
-    <!-- Stats Cards -->
-    <div class="stats-container">
-        <div class="card best">
-            <h3>Best Score</h3>
-            <p th:text="${analysis['best_score']}">—</p>
-        </div>
-        <div class="card worst">
-            <h3>Worst Score</h3>
-            <p th:text="${analysis['worst_score']}">—</p>
-        </div>
-        <div class="card">
-            <h3>Average</h3>
-            <p th:text="${analysis['average_score']}">—</p>
-        </div>
-        <div class="card level">
-            <h3>Level</h3>
-            <p th:text="${analysis['level']}">—</p>
-        </div>
-        <div class="card predict">
-            <h3>Predicted in 7 days</h3>
-            <p th:text="${analysis['predicted_7days']}">—</p>
-        </div>
-        <div class="card sessions">
-            <h3>Total Sessions</h3>
-            <p th:text="${analysis['total_sessions']}">—</p>
-        </div>
-    </div>
-
-    <!-- Trend -->
-    <div class="trend-container">
-        <span>Current trend : </span>
-        <span class="trend"
-              th:classappend="${analysis['trend']}"
-              th:text="${analysis['trend']}">—</span>
-    </div>
-
-    <!-- Chart -->
-    <div class="chart-container">
-        <h2>Score over time</h2>
-
-        <div th:if="${analysis['error']}" class="empty-state">
-            <p>📭 Not enough data yet. Play a few sessions first !</p>
+    <header class="page-header page-header-row">
+        <div>
+            <h1 th:text="#{progress.title}">Your progress</h1>
+            <p class="page-subtitle" th:text="#{progress.subtitle}">Your results across all games.</p>
         </div>
 
-        <canvas th:unless="${analysis['error']}" id="scoreChart"></canvas>
-    </div>
+        <!-- Trend: arrow + text, color only reinforces the meaning -->
+        <p th:if="${hasData}" class="trend-pill" th:classappend="${'trend-' + analysis['trend']}">
+            <span class="muted" th:text="#{progress.trend}">Trend</span>
+            <span aria-hidden="true"
+                  th:text="${analysis['trend'] == 'improving'} ? '↗' : (${analysis['trend'] == 'declining'} ? '↘' : '→')">→</span>
+            <strong th:text="#{${'progress.trend.' + analysis['trend']}}">Stable</strong>
+        </p>
+    </header>
 
-</div>
+    <!-- Analysis service down -->
+    <section th:if="${serviceUnavailable}" class="card empty-state">
+        <h2 th:text="#{progress.unavailable.title}">Statistics are unavailable</h2>
+        <p class="muted" th:text="#{progress.unavailable.text}">The analysis service cannot be reached right now.</p>
+    </section>
 
-<!-- Chart.js Script -->
-<script th:inline="javascript">
-    const scores = /*[[${analysis['scores']}]]*/ [];
+    <!-- Fewer than two games -->
+    <section th:if="${serviceUnavailable == null and !hasData}" class="card empty-state">
+        <h2 th:text="#{progress.empty.title}">Not enough data yet</h2>
+        <p class="muted" th:text="#{progress.empty.text}">Play at least two games to see your progress.</p>
+        <a th:href="@{/azerType}" class="btn btn-primary" th:text="#{progress.empty.cta}">Start practising</a>
+    </section>
 
-    if (scores && scores.length > 0) {
-        const ctx = document.getElementById('scoreChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
+    <th:block th:if="${hasData}">
+        <!-- Key figures -->
+        <section class="stats" th:aria-label="#{progress.title}">
+            <div class="stat">
+                <p class="stat-label" th:text="#{progress.best}">Best score</p>
+                <p class="stat-value" th:text="${analysis['best_score']}">0</p>
+            </div>
+            <div class="stat">
+                <p class="stat-label" th:text="#{progress.average}">Average</p>
+                <p class="stat-value"
+                   th:text="${#numbers.formatDecimal(analysis['average_score'], 1, 'DEFAULT', 1, 'DEFAULT')}">0</p>
+            </div>
+            <div class="stat">
+                <p class="stat-label" th:text="#{progress.worst}">Lowest score</p>
+                <p class="stat-value" th:text="${analysis['worst_score']}">0</p>
+            </div>
+            <div class="stat">
+                <p class="stat-label" th:text="#{progress.sessions}">Games played</p>
+                <p class="stat-value" th:text="${analysis['total_sessions']}">0</p>
+            </div>
+            <div class="stat">
+                <p class="stat-label" th:text="#{progress.level}">Level</p>
+                <p class="stat-value stat-value-text" th:text="#{${'progress.level.' + analysis['level']}}">Beginner</p>
+            </div>
+            <div class="stat">
+                <p class="stat-label" th:text="#{progress.predicted}">Forecast in 7 days</p>
+                <p class="stat-value"
+                   th:text="${#numbers.formatDecimal(analysis['predicted_7days'] < 0 ? 0 : analysis['predicted_7days'], 1, 'DEFAULT', 1, 'DEFAULT')}">0</p>
+            </div>
+        </section>
+
+        <!-- Score over time -->
+        <section class="card">
+            <h2 class="card-title" th:text="#{progress.chart.title}">Score over time</h2>
+            <div class="chart-wrap">
+                <canvas id="scoreChart" role="img" th:aria-label="#{progress.chart.description}"></canvas>
+            </div>
+
+            <details class="data-table">
+                <summary th:text="#{progress.table.show}">Show as table</summary>
+                <table>
+                    <thead>
+                    <tr>
+                        <th scope="col" th:text="#{progress.table.date}">Date</th>
+                        <th scope="col" th:text="#{progress.chart.score}">Score</th>
+                    </tr>
+                    </thead>
+                    <tbody id="scoreTableBody"></tbody>
+                </table>
+            </details>
+        </section>
+    </th:block>
+</main>
+
+<footer class="footer" th:text="#{footer.copyright}">© AzerType</footer>
+
+<th:block th:if="${serviceUnavailable == null and analysis['error'] == null and analysis['scores'] != null}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script th:inline="javascript">
+        // Single series: one neutral color, no legend, tooltip on hover.
+        const scores = /*[[${analysis['scores']}]]*/ [];
+        const scoreLabel = /*[[#{progress.chart.score}]]*/ "Score";
+        const lang = document.documentElement.lang || "en";
+
+        const dateLabel = new Intl.DateTimeFormat(lang, { day: "2-digit", month: "short" });
+        const dateTimeLabel = new Intl.DateTimeFormat(lang, { dateStyle: "medium", timeStyle: "short" });
+        const dates = scores.map((s) => new Date(s.played_at));
+
+        // Table view (same data as the chart)
+        const tbody = document.getElementById("scoreTableBody");
+        scores.forEach((s, i) => {
+            const row = tbody.insertRow();
+            row.insertCell().textContent = dateTimeLabel.format(dates[i]);
+            row.insertCell().textContent = s.score;
+        });
+
+        new Chart(document.getElementById("scoreChart"), {
+            type: "line",
             data: {
-                labels: scores.map(s => s.played_at),
+                labels: dates.map((d) => dateLabel.format(d)),
                 datasets: [{
-                    label: 'Score',
-                    data: scores.map(s => s.score),
-                    borderColor: '#1a73e8',
-                    backgroundColor: 'rgba(26, 115, 232, 0.08)',
+                    label: scoreLabel,
+                    data: scores.map((s) => s.score),
+                    borderColor: "#18181b",
+                    backgroundColor: "rgba(24, 24, 27, 0.05)",
                     borderWidth: 2,
-                    pointBackgroundColor: '#1a73e8',
-                    pointRadius: 5,
-                    tension: 0.4,
+                    pointRadius: scores.length > 30 ? 0 : 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: "#18181b",
+                    pointBorderColor: "#ffffff",
+                    pointBorderWidth: 2,
+                    tension: 0.25,
                     fill: true
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: "index", intersect: false },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
+                        backgroundColor: "#18181b",
+                        padding: 10,
+                        displayColors: false,
                         callbacks: {
-                            label: ctx => 'Score: ' + ctx.parsed.y
+                            title: (items) => dateTimeLabel.format(dates[items[0].dataIndex]),
+                            label: (item) => `${scoreLabel}: ${item.parsed.y}`
                         }
                     }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
-                        grid: { color: '#f0f0f0' }
+                        ticks: { precision: 0, color: "#71717a" },
+                        grid: { color: "#f4f4f5" },
+                        border: { display: false }
                     },
                     x: {
-                        grid: { display: false }
+                        ticks: { color: "#71717a", maxRotation: 0, autoSkip: true, maxTicksLimit: 8 },
+                        grid: { display: false },
+                        border: { color: "#e4e4e7" }
                     }
                 }
             }
         });
-    }
-</script>
+    </script>
+</th:block>
 
 </body>
 </html>

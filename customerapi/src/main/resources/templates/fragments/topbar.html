@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Shared top bar.
+  - Logged out: logo, language switcher (EN | DE), log in, sign up.
+  - Logged in: logo, Practice / Progress links, language switcher, log out.
+  Parameter "active": the current page ('home', 'practice', 'progress', 'auth'),
+  used to highlight the matching link.
+  Requires topbar.css and language.js on the page.
+-->
+<header th:fragment="topbar(active)" class="topbar">
+    <div class="topbar-left">
+        <a th:href="@{/}" class="topbar-logo" th:aria-label="#{nav.home}">
+            <span class="topbar-logo-icon" aria-hidden="true">⌨</span>
+            <span class="topbar-logo-text">AzerType</span>
+        </a>
+
+        <nav th:if="${loggedIn}" class="topbar-nav" th:aria-label="#{nav.main}">
+            <a th:href="@{/azerType}" th:text="#{nav.practice}"
+               th:classappend="${active == 'practice'} ? 'active' : ''"
+               th:aria-current="${active == 'practice'} ? 'page' : null">Practice</a>
+            <a th:href="@{/progression}" th:text="#{nav.progress}"
+               th:classappend="${active == 'progress'} ? 'active' : ''"
+               th:aria-current="${active == 'progress'} ? 'page' : null">Progress</a>
+        </nav>
+    </div>
+
+    <div class="topbar-actions">
+        <div class="lang-switch" role="group" th:aria-label="#{lang.label}">
+            <a href="?lang=en" data-lang="en" hreflang="en" lang="en"
+               th:classappend="${#locale.language == 'de'} ? '' : 'active'"
+               th:attr="aria-current=${#locale.language == 'de'} ? 'false' : 'true'">EN</a>
+            <a href="?lang=de" data-lang="de" hreflang="de" lang="de"
+               th:classappend="${#locale.language == 'de'} ? 'active' : ''"
+               th:attr="aria-current=${#locale.language == 'de'} ? 'true' : 'false'">DE</a>
+        </div>
+
+        <th:block th:unless="${loggedIn}">
+            <a th:href="@{/auth/login}" class="topbar-btn topbar-btn-ghost" th:text="#{nav.login}">Log in</a>
+            <a th:href="@{/auth/register}" class="topbar-btn topbar-btn-primary" th:text="#{nav.signup}">Sign up</a>
+        </th:block>
+
+        <form th:if="${loggedIn}" th:action="@{/auth/logout}" method="post" class="topbar-logout">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <button type="submit" class="topbar-btn topbar-btn-ghost" th:text="#{nav.logout}">Log out</button>
+        </form>
+    </div>
+</header>
+
+</body>
+</html>

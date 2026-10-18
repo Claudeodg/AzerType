@@ -4,15 +4,15 @@ import claudodg.customerapi.entity.Score;
 import claudodg.customerapi.entity.User;
 import claudodg.customerapi.reposotorie.ScoreRepository;
 import claudodg.customerapi.service.ScoreAnalysisService;
-import jakarta.servlet.http.HttpSession;
+import claudodg.customerapi.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -21,41 +21,42 @@ public class PageController {
 
     private final ScoreAnalysisService analysisService;
     private final ScoreRepository  scoreRepository;
+    private final UserService userService;
 
-    public PageController(ScoreAnalysisService analysisService,ScoreRepository  scoreRepository) {
+    public PageController(ScoreAnalysisService analysisService, ScoreRepository scoreRepository, UserService userService) {
         this.analysisService = analysisService;
         this.scoreRepository = scoreRepository;
+        this.userService = userService;
     }
 
+    /** Public home page with a typing demo that works without an account. */
     @GetMapping("/")
     public String home() {
-        return "redirect:/auth/register";
+        return "home";
     }
 
+    // Login requirement for these routes is enforced by Spring Security
+    // (see security.SecurityConfig), so principal is never null here.
+
     @GetMapping("/azerType")
-    public String azertype(HttpSession session) {
-        if (session.getAttribute("user") == null) {
-            return "redirect:/auth/login";
-        }
+    public String azertype() {
         return "azerType";
     }
 
     @GetMapping("/progression")
-    public String scoresPage(HttpSession session, Model model) {
+    public String scoresPage(Principal principal, Model model) {
 
-        User user = (User) session.getAttribute("user");
+        User user = userService.getByEmail(principal.getName());
 
-        if (user == null) {
-            return "redirect:/auth/login";
-        }
         try {
-
-        Map<String, Object> analysis = analysisService.analyzeUserScores(user);
-        model.addAttribute("analysis", analysis);
-        return "progression";
+            Map<String, Object> analysis = analysisService.analyzeUserScores(user);
+            model.addAttribute("analysis", analysis != null ? analysis : Map.of());
+            return "progression";
 
         } catch (Exception e) {
-            model.addAttribute("analysis", Map.of("error", "Service unavailable"));
+            // The Python analysis service is down or unreachable.
+            model.addAttribute("analysis", Map.of());
+            model.addAttribute("serviceUnavailable", true);
             return "progression";
         }
     }
@@ -63,9 +64,8 @@ public class PageController {
     @PostMapping("/score")
     public ResponseEntity<String> saveScore(
             @RequestBody Map<String, Integer> body,
-            HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        if (user == null) return ResponseEntity.status(401).build();
+            Principal principal) {
+        User user = userService.getByEmail(principal.getName());
         Score score = new Score();
         score.setValeur(body.get("score"));
         score.setDate(LocalDateTime.now());

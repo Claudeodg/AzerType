@@ -1,112 +1,125 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AzerType - Typing Speed Trainer</title>
-    <link rel="stylesheet" th:href="@{/style.css}">
+    <title th:text="#{game.pageTitle}">AzerType – Practice</title>
+    <link rel="stylesheet" th:href="@{/topbar.css}">
+    <link rel="stylesheet" th:href="@{/app.css}">
+
+    <!-- Texts used by the game scripts, in the language chosen by the user. -->
+    <script th:inline="javascript">
+        window.I18N = {
+            progress: /*[[#{game.progress}]]*/ "Item {0} of {1}",
+            correct: /*[[#{game.feedback.correct}]]*/ "Correct",
+            wrong: /*[[#{game.feedback.wrong}]]*/ "Incorrect – expected: {0}",
+            saved: /*[[#{game.over.saved}]]*/ "Your score has been saved.",
+            notSaved: /*[[#{game.over.notSaved}]]*/ "Your score could not be saved.",
+            generating: /*[[#{game.ai.generating}]]*/ "Generating…",
+            generated: /*[[#{game.ai.generated}]]*/ "{0} items generated.",
+            generationError: /*[[#{game.ai.error}]]*/ "Generation failed. Please try again.",
+            needContent: /*[[#{game.ai.needContent}]]*/ "Generate a list with AI first."
+        };
+    </script>
+    <script th:src="@{/language.js}" defer></script>
     <script th:src="@{/config.js}" defer></script>
     <script th:src="@{/script4.js}" defer></script>
-    <script th:src="@{/main.js}" defer></script>
     <script th:src="@{/apigemini.js}" defer></script>
-    <script th:src="@{/scriptSidebar.js}" defer></script>
-
+    <script th:src="@{/main.js}" defer></script>
 </head>
 <body>
-    <div class="modal-overlay" id="gameOverModal">
-        <div class="modal">
-            <h2>🎮 Game Over !</h2>
-            <div class="final-score" id="finalScore">0</div>
-            <p class="score-label">Your final score</p>
-            <div class="modal-buttons">
-                <button class="btn-play-again" id="btnPlayAgain">▶ Play Again</button>
-                <button class="btn-progression" onclick="window.location.href='/progression'">📊 My Progression</button>
-            </div>
-        </div>
-    </div>
-    <!-- 1. Button hamburger — before sidebar -->
-    <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
-        <span></span>
-        <span></span>
-        <span></span>
-    </button>
 
-    <!-- 2. Overlay dark -->
-    <div class="overlay" id="overlay"></div>
+<div th:replace="~{fragments/topbar :: topbar('practice')}"></div>
 
-
-    <div class="sidebar" id="sidebar">
-        <div class="logo">🎮 AzerType</div>
-        <a href="/azerType" class="active">🕹️ Play</a>
-        <a href="/progression" >📊 My Progression</a>
-    </div>
-
-
-    <header>
-        <h1>AzerType</h1>
-        <h2>The application to type faster</h2>
-        <h3>AzerType is an online application to learn to type faster on the keyboard :</h3>
+<main class="page page-narrow">
+    <header class="page-header">
+        <h1 th:text="#{game.title}">Practice</h1>
+        <p class="page-subtitle" th:text="#{game.subtitle}">Type the word or sentence shown, then press Enter.</p>
     </header>
-    <main>
-        <div class="optionArea">
-            <p>Choose your option and type the proposition that appears in the field below.</p>
-            <div class="optionSource">
-                <input type="radio" name="optionSource" id="word" value="1" checked>
-                <label for="word">Words</label>
-                <input type="radio" name="optionSource" id="sentences" value="2">
-                <label for="sentences">Sentences</label>
-                <input type="radio" name="optionSource" id="ai" value="3">
-                <label for="ai">🤖 AI</label>
 
+    <section class="card">
+        <!-- Mode: words, sentences or AI-generated list -->
+        <fieldset class="segmented">
+            <legend class="visually-hidden" th:text="#{game.mode.label}">Mode</legend>
+            <input type="radio" name="optionSource" id="word" value="1" checked>
+            <label for="word" th:text="#{game.mode.words}">Words</label>
+            <input type="radio" name="optionSource" id="sentences" value="2">
+            <label for="sentences" th:text="#{game.mode.sentences}">Sentences</label>
+            <input type="radio" name="optionSource" id="ai" value="3">
+            <label for="ai" th:text="#{game.mode.ai}">AI</label>
+        </fieldset>
+
+        <!-- AI options, only visible in AI mode -->
+        <div id="aiPanel" class="ai-panel" hidden>
+            <div class="field">
+                <label for="aiType" th:text="#{game.ai.type}">Content</label>
+                <select id="aiType">
+                    <option value="words" th:text="#{game.mode.words}">Words</option>
+                    <option value="sentences" th:text="#{game.mode.sentences}">Sentences</option>
+                </select>
             </div>
-        </div>
-        <div id="aiPanel" style="display: none;">
-            <select id="aiType">
-                <option value="words">Words</option>
-                <option value="sentences">Sentences</option>
-            </select>
-
-            <select id="aiTheme">
-                <option value="general">General</option>
-                <option value="nature">Nature</option>
-                <option value="technology">Technology</option>
-                <option value="cooking">Cooking</option>
-                <option value="sports">Sports</option>
-                <option value="animals">Animals</option>
-                <option value="travel">Travel</option>
-            </select>
-
-            <select id="aiLevel">
-                <option value="easy">Easy</option>
-                <option value="medium" selected>Medium</option>
-                <option value="hard">Hard</option>
-            </select>
-
-            <input type="number" id="aiCount" value="10" min="5" max="30" style="width: 60px;">
-            <button id="btnGenerateAI">▶ Generate</button>
-            <span id="aiStatus"></span>
-        </div>
-
-        <div class="propositionArea">
-            Qwertz
+            <div class="field">
+                <label for="aiTheme" th:text="#{game.ai.topic}">Topic</label>
+                <select id="aiTheme">
+                    <option value="general" th:text="#{game.ai.topic.general}">General</option>
+                    <option value="nature" th:text="#{game.ai.topic.nature}">Nature</option>
+                    <option value="technology" th:text="#{game.ai.topic.technology}">Technology</option>
+                    <option value="cooking" th:text="#{game.ai.topic.cooking}">Cooking</option>
+                    <option value="sports" th:text="#{game.ai.topic.sports}">Sports</option>
+                    <option value="animals" th:text="#{game.ai.topic.animals}">Animals</option>
+                    <option value="travel" th:text="#{game.ai.topic.travel}">Travel</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="aiLevel" th:text="#{game.ai.level}">Level</label>
+                <select id="aiLevel">
+                    <option value="easy" th:text="#{game.ai.level.easy}">Easy</option>
+                    <option value="medium" selected th:text="#{game.ai.level.medium}">Medium</option>
+                    <option value="hard" th:text="#{game.ai.level.hard}">Hard</option>
+                </select>
+            </div>
+            <div class="field field-small">
+                <label for="aiCount" th:text="#{game.ai.count}">Number</label>
+                <input type="number" id="aiCount" value="10" min="5" max="30">
+            </div>
+            <button type="button" id="btnGenerateAI" class="btn btn-secondary" th:text="#{game.ai.generate}">Generate</button>
+            <p id="aiStatus" class="ai-status" role="status"></p>
         </div>
 
-        <div class="writeArea">
-            <input type="text" id="input" name="input" placeholder="Type here...">
-            <button id="validation">Validate</button>
+        <!-- Progress and score -->
+        <div class="game-meta">
+            <span id="progressText" class="muted"></span>
+            <span><span class="muted" th:text="#{game.score}">Score</span> <strong id="scoreText">0/0</strong></span>
+        </div>
+        <div class="progress-bar" aria-hidden="true"><div id="progressFill"></div></div>
+
+        <!-- Word or sentence to type -->
+        <p class="proposition" id="proposition" aria-live="polite"></p>
+
+        <div class="answer-row">
+            <label for="input" class="visually-hidden" th:text="#{game.input.label}">Your answer</label>
+            <input type="text" id="input" name="input" autocomplete="off" autocapitalize="off" spellcheck="false"
+                   th:placeholder="#{game.input.placeholder}" placeholder="Type here and press Enter">
+            <button type="button" id="validation" class="btn btn-primary" th:text="#{game.validate}">Validate</button>
         </div>
 
-        <div class="scoreArea">
-            Your score: <span>0</span>
-        </div>
+        <p id="feedback" class="feedback" role="status"></p>
+    </section>
+</main>
 
-    </main>
+<footer class="footer" th:text="#{footer.copyright}">© AzerType</footer>
 
+<!-- End of game -->
+<dialog id="gameOverModal" class="dialog" aria-labelledby="gameOverTitle">
+    <h2 id="gameOverTitle" th:text="#{game.over.title}">Game finished</h2>
+    <p class="muted" th:text="#{game.over.scoreLabel}">Your score</p>
+    <p class="final-score" id="finalScore">0</p>
+    <p class="muted small" id="saveStatus"></p>
+    <div class="dialog-actions">
+        <a th:href="@{/progression}" class="btn btn-secondary" th:text="#{game.over.progress}">View progress</a>
+        <button type="button" class="btn btn-primary" id="btnPlayAgain" autofocus th:text="#{game.over.again}">Play again</button>
+    </div>
+</dialog>
 
-
-    <footer>
-        @Copyright: OfTheGoodness
-    </footer>
 </body>
 </html>
