@@ -1,0 +1,3 @@
+azertypesc.duckdns.org{
+    reverse_proxy customerapi:8080
+}

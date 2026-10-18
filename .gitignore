@@ -11,3 +11,7 @@ __pycache__/
 
 # Test caches
 .pytest_cache/
+
+# Personal session notes (not published)
+docs/resume-*.md
+token domain : e9be8a9b-994e-49dc-9c07-e67a42787dc7

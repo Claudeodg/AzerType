@@ -1,0 +1,48 @@
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: customerapi
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  microservice:
+    build: ./MicroService
+    restart: unless-stopped
+
+  customerapi:
+    build: ./customerapi
+    restart: unless-stopped
+    depends_on:
+      - mysql
+      - microservice
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:mysql://mysql:3306/customerapi
+      DB_USERNAME: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      PYTHON_SERVICE_URL: http://microservice:5000
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      APP_BASE_URL: ${APP_BASE_URL}
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+    depends_on:
+      - customerapi
+
+volumes:
+  mysql_data:
+  caddy_data:
